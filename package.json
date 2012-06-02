@@ -3,7 +3,7 @@
   "name": "mollie",
   "description": "Access the Mollie API (http://mollie.nl)",
   "version": "0.1.0",
-  "homepage": "https://github.com/fvdm/nodejs-mollie/",
+  "homepage": "http://fvdm.github.com/nodejs-mollie/",
   "repository": {
     "type": "git",
     "url": "git://github.com/fvdm/nodejs-mollie.git"
@@ -12,9 +12,9 @@
     "url": "https://github.com/fvdm/nodejs-mollie/issues"
   },
   "main": "mollie.js",
-  "dependencies": [
-    "node-xml2json"
-  ],
+  "dependencies": {
+    "node-xml2json": ">=1.0.0 <2.0.0"
+  },
   "devDependencies": {},
   "optionalDependencies": {},
   "engines": {

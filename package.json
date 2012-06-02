@@ -1,0 +1,29 @@
+{
+  "author": "Franklin van de Meent <fr@nkl.in> (http://frankl.in)",
+  "name": "mollie",
+  "description": "Access the Mollie API (http://mollie.nl)",
+  "version": "0.1.0",
+  "homepage": "https://github.com/fvdm/nodejs-mollie/",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/fvdm/nodejs-mollie.git"
+  },
+  "bugs": {
+    "url": "https://github.com/fvdm/nodejs-mollie/issues"
+  },
+  "main": "mollie.js",
+  "dependencies": [
+    "node-xml2json"
+  ],
+  "devDependencies": {},
+  "optionalDependencies": {},
+  "engines": {
+    "node": "*"
+  },
+  "tags": [
+    "mollie",
+    "api",
+    "sms",
+    "ideal"
+  ]
+}

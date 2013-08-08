@@ -25,6 +25,16 @@ mollie.api = {
 	password: 	''
 }
 
+// Mollie sends bank id's in four digits with zero padding
+// and xml2json sees that as oct numbers. Here's a quick fix:
+function fixBankId(invalid_bank_id) {
+	result = parseInt(invalid_bank_id.toString(8),10)
+	result = result.toString()
+	while( result.length < 4 )
+		result = "0" + result
+	return result
+}
+
 
 // Account credits
 mollie.credits = function( callback ) {
@@ -205,16 +215,16 @@ mollie.ideal = {
 						bank = res.bank[b]
 						// Mollie sends bank id's in four digits with zero padding
 						// and xml2json sees that as oct numbers. Here's a quick fix:
-						bank_id = parseInt(bank.bank_id.toString(8),10)
-						banks[ bank_id ] = bank
+						bank.bank_id = fixBankId( bank.bank_id )
+						banks[ bank.bank_id ] = bank
 					}
 				}
 				else
 				{
 					// Mollie sends bank id's in four digits with zero padding
 					// and xml2json sees that as oct numbers. Here's a quick fix:
-					bank_id = parseInt(res.bank.bank_id.toString(8),10)
-					banks[ bank_id ] = res.bank
+					res.bank.bank_id = fixBankId( res.bank.bank_id )
+					banks[ res.bank.bank_id ] = res.bank
 				}
 			}
 			callback( banks )

@@ -203,12 +203,18 @@ mollie.ideal = {
 				if( res.bank.bank_id === undefined ) {
 					for( var b in res.bank ) {
 						bank = res.bank[b]
-						banks[ bank.bank_id ] = bank
+						// Mollie sends bank id's in four digits with zero padding
+						// and xml2json sees that as oct numbers. Here's a quick fix:
+						bank_id = parseInt(bank.bank_id.toString(8),10)
+						banks[ bank_id ] = bank
 					}
 				}
 				else
 				{
-					banks[ res.bank.bank_id ] = res.bank
+					// Mollie sends bank id's in four digits with zero padding
+					// and xml2json sees that as oct numbers. Here's a quick fix:
+					bank_id = parseInt(res.bank.bank_id.toString(8),10)
+					banks[ bank_id ] = res.bank
 				}
 			}
 			callback( banks )

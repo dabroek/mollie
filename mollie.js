@@ -25,16 +25,13 @@ mollie.api = {
 	password: 	''
 }
 
-// Mollie sends bank id's in four digits with zero padding
-// and xml2json sees that as oct numbers. Here's a quick fix:
-function fixBankId(invalid_bank_id) {
-	result = parseInt(invalid_bank_id.toString(8),10)
-	result = result.toString()
-	while( result.length < 4 )
-		result = "0" + result
-	return result
-}
-
+// Padding for the four digit bank_ids 
+String.prototype.lpad = function( chr, count ) {
+	var str = this;
+	while(str.length < count) 
+		str = chr + str;
+	return str;
+};
 
 // Account credits
 mollie.credits = function( callback ) {
@@ -213,17 +210,17 @@ mollie.ideal = {
 				if( res.bank.bank_id === undefined ) {
 					for( var b in res.bank ) {
 						bank = res.bank[b]
-						// Mollie sends bank id's in four digits with zero padding
-						// and xml2json sees that as oct numbers. Here's a quick fix:
-						bank.bank_id = fixBankId( bank.bank_id )
+						bank.bank_id = bank.bank_id.toString()
+						if( bank.bank_id.length < 4 )
+							bank.bank_id = bank.bank_id.lpad("0",4)
 						banks[ bank.bank_id ] = bank
 					}
 				}
 				else
 				{
-					// Mollie sends bank id's in four digits with zero padding
-					// and xml2json sees that as oct numbers. Here's a quick fix:
-					res.bank.bank_id = fixBankId( res.bank.bank_id )
+					res.bank.bank_id = res.bank.bank_id.toString()
+					if( res.bank.bank_id.length < 4 )
+						res.bank.bank_id = res.bank.bank_id.lpad("0",4)
 					banks[ res.bank.bank_id ] = res.bank
 				}
 			}
@@ -271,6 +268,11 @@ mollie.talk = function( path, fields, callback ) {
 			
 			response.on( 'data', function( chunk ) { data += chunk });
 			response.on( 'end', function() {
+
+				// Remove leading zero's in bank_id's so xml2json won't parse
+				// then as octal numbers:
+				data = data.replace(/>0+(\d+)</g, ">$1<")
+
 				data = xml2json.parser( data )
 				data = data.response
 				if( data.item != undefined ) {

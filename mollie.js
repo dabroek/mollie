@@ -23,6 +23,14 @@ mollie.api = {
 	password: 	''
 }
 
+// Padding for the four digit bank_ids 
+String.prototype.lpad = function( chr, count ) {
+	var str = this
+	while( str.length < count ) {
+		str = chr + str
+	}
+	return str
+}
 
 // Account credits
 mollie.credits = function( callback ) {
@@ -201,11 +209,19 @@ mollie.ideal = {
 				if( res.bank.bank_id === undefined ) {
 					for( var b in res.bank ) {
 						bank = res.bank[b]
+						bank.bank_id = bank.bank_id.toString()
+						if( bank.bank_id.length < 4 ) {
+							bank.bank_id = bank.bank_id.lpad( "0", 4 )
+						}
 						banks[ bank.bank_id ] = bank
 					}
 				}
 				else
 				{
+					res.bank.bank_id = res.bank.bank_id.toString()
+					if( res.bank.bank_id.length < 4 ) {
+						res.bank.bank_id = res.bank.bank_id.lpad( "0", 4 )
+					}
 					banks[ res.bank.bank_id ] = res.bank
 				}
 			}
@@ -279,8 +295,13 @@ mollie.talk = function( path, fields, callback ) {
 			if( data === '' ) {
 				error = new Error('no response data')
 			} else {
+				// Remove leading zero's in bank_id's so xml2json won't parse
+				// then as octal numbers:
+				data = data.replace( />0+(\d+)</g, ">$1<" )
+				
 				data = xml2json.parser( data.trim() )
 				data = data.response
+				
 				if( data.item !== undefined ) {
 					data = data.item
 				}

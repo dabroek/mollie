@@ -282,7 +282,7 @@ mollie.talk = function( path, fields, callback ) {
 				}
 				
 				// catch API errors
-				if( data.resultcode != 10 ) {
+				if( data.resultcode > 10 ) {
 					error = new Error('API error')
 					error.code = data.resultcode
 					error.error = data.resultmessage

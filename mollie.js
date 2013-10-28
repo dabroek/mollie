@@ -176,7 +176,14 @@ mollie.ideal = {
 		}
 		
 		// request
-		mollie.talk( 'ideal', vars, callback )
+		mollie.talk( 'ideal', vars, function( err, res ) {
+			if( err ) {
+				callback( err )
+			} else {
+				res = res.order
+				callback( null, res )
+			}
+		})
 		
 	},
 	

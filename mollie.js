@@ -230,23 +230,23 @@ mollie.talk = function( path, fields, callback ) {
 	var query = typeof fields === 'object' ? querystring.stringify( fields ) : ''
 	
 	// build request
-	var req = https.request(
-		{
-			host:		'www.mollie.nl',
-			port:		443,
-			path:		'/xml/'+ path,
-			method:		'POST',
-			headers:	{
-				'Content-Type':		'application/x-www-form-urlencoded',
-				'Content-Length':	query.length
-			},
-			agent:		false
-		},
+	var options = {
+		host: 'www.mollie.nl',
+		port: 443,
+		path: '/xml/'+ path,
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/x-www-form-urlencoded',
+			'Content-Length': query.length
+		}
+	}
+	
+	var request = https.request( options )
+	
+	// response
+	request.on( 'response', function( response ) {
 		
-		// response
-		function( response ) {
 			
-			// response
 			response.setEncoding('utf8')
 			var data = ''
 			
@@ -260,8 +260,7 @@ mollie.talk = function( path, fields, callback ) {
 				callback( data )
 			});
 			
-		}
-	)
+	})
 	
 	// post and close
 	req.write( query )

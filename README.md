@@ -22,6 +22,34 @@ You can also download directly from the Github repository, but this can be *unst
 	npm install git+https://github.com/fvdm/nodejs-mollie
 
 
+Error handling
+--------------
+
+The callbacks receive two parameters. This first is `err`: either `null` or `instanceof Error` when something went wrond. The second is `data` with the response.
+
+
+### Example
+
+```js
+function myCallback( err, data ) {
+	if( err ) {
+		console.log( err )
+	} else {
+		console.log( data.credits )
+	}
+}
+```
+
+
+### Errors
+
+	Error: request failed     The request can't be made, see `err.error`
+	Error: disconnected       The API closed the connection too early.
+	Error: no response data   The API response was completely empty.
+	Error: API error          The API return an error, see `err.error` and `err.code`.
+
+
+
 Usage
 -----
 

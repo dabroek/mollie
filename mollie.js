@@ -191,21 +191,25 @@ mollie.ideal = {
 		}
 		
 		// request
-		mollie.talk( 'ideal', vars, function( res ) {
-			var banks = {}
-			if( res && res.bank ) {
-				if( res.bank.bank_id === undefined ) {
-					for( var b in res.bank ) {
-						bank = res.bank[b]
-						banks[ bank.bank_id ] = bank
+		mollie.talk( 'ideal', vars, function( err, res ) {
+			if( err ) {
+				callback( err )
+			} else {
+				var banks = {}
+				if( res && res.bank ) {
+					if( res.bank.bank_id === undefined ) {
+						for( var b in res.bank ) {
+							bank = res.bank[b]
+							banks[ bank.bank_id ] = bank
+						}
+					}
+					else
+					{
+						banks[ res.bank.bank_id ] = res.bank
 					}
 				}
-				else
-				{
-					banks[ res.bank.bank_id ] = res.bank
-				}
+				callback( null, banks )
 			}
-			callback( banks )
 		})
 		
 	}

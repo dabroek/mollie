@@ -182,6 +182,9 @@ mollie.ideal = {
 			} else {
 				res = res.order
 				res.payed = res.payed === 'true' ? true : false
+				if( res.consumer && res.consumer.consumercity === 'NOT PROVIDED' ) {
+					res.consumer.consumercity = null
+				}
 				callback( null, res )
 			}
 		})

@@ -193,7 +193,7 @@ mollie.ideal = {
 		// request
 		mollie.talk( 'ideal', vars, function( res ) {
 			var banks = {}
-			if( typeof res === 'object' && typeof res.bank === 'object' ) {
+			if( res && res.bank ) {
 				if( res.bank.bank_id === undefined ) {
 					for( var b in res.bank ) {
 						bank = res.bank[b]

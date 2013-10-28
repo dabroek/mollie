@@ -214,15 +214,13 @@ mollie.ideal = {
 							}
 							banks[ bank.bank_id ] = bank
 						}
+					} else {
+						res.bank.bank_id = res.bank.bank_id.toString()
+						if( res.bank.bank_id.length < 4 ) {
+							res.bank.bank_id = res.bank.bank_id.lpad( "0", 4 )
+						}
+						banks[ res.bank.bank_id ] = res.bank
 					}
-				}
-				else
-				{
-					res.bank.bank_id = res.bank.bank_id.toString()
-					if( res.bank.bank_id.length < 4 ) {
-						res.bank.bank_id = res.bank.bank_id.lpad( "0", 4 )
-					}
-					banks[ res.bank.bank_id ] = res.bank
 				}
 				callback( null, banks )
 			}

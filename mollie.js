@@ -1,13 +1,9 @@
 /*
-	nodejs-mollie
-	
-	An unofficial Node.js module to access the Mollie API
-	
-	This code is COPYLEFT meaning you can do with it anything you
-	like, except copyrighting it. It would be nice to refer back
-	to the source:
-	
-	https://github.com/fvdm/nodejs-mollie/
+Name:          nodejs-mollie
+Description:   Node.js module to access the Mollie payments and MessageBird SMS APIs.
+Source:        https://github.com/fvdm/nodejs-mollie
+Feedback:      https://github.com/fvdm/nodejs-mollie/issues
+License:       Public Domain / Unlicense (see UNLICENSE file)
 */
 
 // MODULE
@@ -203,17 +199,21 @@ mollie.ideal = {
 		}
 		
 		// request
-		mollie.talk( 'ideal', vars, function( res ) {
-			var banks = {}
-			if( typeof res === 'object' && typeof res.bank === 'object' ) {
-				if( res.bank.bank_id === undefined ) {
-					for( var b in res.bank ) {
-						bank = res.bank[b]
-						bank.bank_id = bank.bank_id.toString()
-						if( bank.bank_id.length < 4 ) {
-							bank.bank_id = bank.bank_id.lpad( "0", 4 )
+		mollie.talk( 'ideal', vars, function( err, res ) {
+			if( err ) {
+				callback( err )
+			} else {
+				var banks = {}
+				if( res && res.bank ) {
+					if( res.bank.bank_id === undefined ) {
+						for( var b in res.bank ) {
+							bank = res.bank[b]
+							bank.bank_id = bank.bank_id.toString()
+							if( bank.bank_id.length < 4 ) {
+								bank.bank_id = bank.bank_id.lpad( "0", 4 )
+							}
+							banks[ bank.bank_id ] = bank
 						}
-						banks[ bank.bank_id ] = bank
 					}
 				}
 				else
@@ -224,12 +224,10 @@ mollie.ideal = {
 					}
 					banks[ res.bank.bank_id ] = res.bank
 				}
+				callback( null, banks )
 			}
-			callback( banks )
 		})
-		
 	}
-	
 }
 
 
@@ -307,7 +305,7 @@ mollie.talk = function( path, fields, callback ) {
 				}
 				
 				// catch API errors
-				if( data.resultcode != 10 ) {
+				if( data.resultcode > 10 ) {
 					error = new Error('API error')
 					error.code = data.resultcode
 					error.error = data.resultmessage

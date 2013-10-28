@@ -274,6 +274,10 @@ mollie.talk = function( path, fields, callback ) {
 			size += chunk.length
 		})
 		
+		response.on( 'close', function() {
+			doCallback( new Error('disconnected') )
+		})
+		
 		response.on( 'end', function() {
 			var error = null
 			

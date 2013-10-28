@@ -3,7 +3,6 @@ nodejs-mollie
 
 Node.js module to access the [Mollie](https://www.mollie.nl/) API.
 
-[![Build Status](https://secure.travis-ci.org/fvdm/nodejs-mollie.png?branch=master)](http://travis-ci.org/fvdm/nodejs-mollie)
 
 ## Dependencies
 

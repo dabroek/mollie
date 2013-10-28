@@ -245,12 +245,18 @@ mollie.talk = function( path, fields, callback ) {
 	
 	// response
 	request.on( 'response', function( response ) {
+		var data = []
+		var size = 0
+		
+		response.on( 'data', function( chunk ) {
+			data.push(chunk)
+			size += chunk.length
+		})
 		
 			
 			response.setEncoding('utf8')
 			var data = ''
 			
-			response.on( 'data', function( chunk ) { data += chunk });
 			response.on( 'end', function() {
 				data = xml2json.parser( data )
 				data = data.response

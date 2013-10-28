@@ -319,6 +319,12 @@ mollie.talk = function( path, fields, callback ) {
 		})
 	})
 	
+	response.on( 'error', function( error ) {
+		var err = new Error('request failed')
+		err.error = error
+		doCallback( err )
+	})
+	
 	// post and close
 	request.end( query )
 	

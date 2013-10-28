@@ -226,6 +226,15 @@ mollie.talk = function( path, fields, callback ) {
 		var fields = {}
 	}
 	
+	// prevent multiple callbacks
+	var complete = false
+	function doCallback( err, res ) {
+		if( ! complete ) {
+			complete = true
+			callback( err, res )
+		}
+	}
+	
 	// query string
 	var query = typeof fields === 'object' ? querystring.stringify( fields ) : ''
 	
@@ -253,19 +262,33 @@ mollie.talk = function( path, fields, callback ) {
 			size += chunk.length
 		})
 		
+		response.on( 'end', function() {
+			var error = null
 			
-			response.setEncoding('utf8')
-			var data = ''
+			// combine chunks
+			var buf = new Buffer(size)
+			var pos = 0
+			for( var d in data ) {
+				data[d].copy( buf, pos )
+				pos += data[d].length
+			}
 			
-			response.on( 'end', function() {
-				data = xml2json.parser( data )
+			data = data.toString('utf8').trim()
+			
+			// process response
+			if( data === '' ) {
+				error = new Error('no response data')
+			} else {
+				data = xml2json.parser( data.trim() )
 				data = data.response
 				if( data.item !== undefined ) {
 					data = data.item
 				}
-				callback( data )
-			});
+			}
 			
+			// return result
+			doCallback( error, data )
+		})
 	})
 	
 	// post and close

@@ -17,6 +17,10 @@ Installation is straightforward with NPM, this will take care of any dependencie
 
 	npm install mollie
 
+You can also download directly from the Github repository, but this can be *unstable*.
+
+	npm install git+https://github.com/fvdm/nodejs-mollie
+
 
 Usage
 -----

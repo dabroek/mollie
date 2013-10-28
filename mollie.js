@@ -307,10 +307,10 @@ mollie.talk = function( path, fields, callback ) {
 				}
 				
 				// catch API errors
-				if( data.resultcode > 10 ) {
+				if( data.resultcode > 10 || data.type === 'error' ) {
 					error = new Error('API error')
-					error.code = data.resultcode
-					error.error = data.resultmessage
+					error.code = data.resultcode || data.errorcode
+					error.error = data.resultmessage || data.message
 				}
 			}
 			

@@ -181,6 +181,7 @@ mollie.ideal = {
 				callback( err )
 			} else {
 				res = res.order
+				res.payed = res.payed === 'true' ? true : false
 				callback( null, res )
 			}
 		})

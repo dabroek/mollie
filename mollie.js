@@ -284,6 +284,13 @@ mollie.talk = function( path, fields, callback ) {
 				if( data.item !== undefined ) {
 					data = data.item
 				}
+				
+				// catch API errors
+				if( data.resultcode != 10 ) {
+					error = new Error('API error')
+					error.code = data.resultcode
+					error.error = data.resultmessage
+				}
 			}
 			
 			// return result

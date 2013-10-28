@@ -4,19 +4,22 @@ nodejs-mollie
 Node.js module to access the [Mollie](https://www.mollie.nl/) API.
 
 
-## Dependencies
+Dependencies
+------------
 
 * [node-xml2json](http://search.npmjs.org/#/node-xml2json) ([github](https://github.com/Kenshin/node-xml2json/)) - This xml2json module is very light and fast.
 
-## Installation
+
+Installation
+------------
 
 Installation is straightforward with NPM, this will take care of any dependencies. The release on NPM is always the latest stable version.
 
-```
-npm install mollie
-```
+	npm install mollie
 
-## Usage
+
+Usage
+-----
 
 ### Setup
 
@@ -28,7 +31,8 @@ To use account specific functions you need to specify your credentials in the **
 
 * **password** - your account or HTTP-API password
 
-### Hello world:
+
+### Example
 
 Below is a very basic example, including setup and call.
 
@@ -57,22 +61,13 @@ Output:
 Or in case of an error
 
 ```js
-{ type: 'credits',
-  resultcode: 30,
-  resultmessage: 'Incorrect username or password.',
-  credits: 0,
-  euro: 0 }
+{ [Error: API error] code: 30,
+  error: 'Incorrect username or password.' }
 ```
 
-### Load from source
 
-To load the module directly from sourcecode, require the module like this:
-
-```js
-var mollie = require('/path/to/mollie.js');
-```
-
-## mollie.credits
+mollie.credits
+--------------
 
 Get remaining account credits
 
@@ -87,15 +82,20 @@ mollie.credits( console.log )
   euro: 0 }
 ```
 
-## mollie.hlr
+
+mollie.hlr
+----------
 
 **HLR-lookup (Network Query)**
 
 Request the MNC network code for a number. A complete list with the codes can be found at [Wikipedia](http://en.wikipedia.org/wiki/Mobile_Network_Code). The response will be pushed to your HLR report URL as provided on your [SMS settings page](https://www.mollie.nl/beheer/sms-diensten/instellingen/).
 
-* **reference** - your internal reference ID for this lookup, will be included in the report callback.
-
-* **recipients** - the number to lookup in international format, digits only. Although the name is plural, provide only **one** number for each call.
+	reference    Your internal reference ID for this lookup, will
+	             be included in the report callback.
+	
+	recipients   The number to lookup in international format,
+	             digits only. Although the name is plural, provide
+	             only _one_ number for each call.
 
 ```js
 mollie.hlr(
@@ -107,8 +107,6 @@ mollie.hlr(
 )
 ```
 
-Output:
-
 ```js
 { type: 'sms',
   recipients: 1,
@@ -117,7 +115,9 @@ Output:
   resultmessage: 'Network query sent.' }
 ```
 
-## mollie.sms
+
+mollie.sms
+----------
 
 Send a normal or premium SMS to one or many recipients at once.
 
@@ -136,8 +136,6 @@ mollie.sms(
 )
 ```
 
-Output:
-
 ```js
 { type: 'sms',
   recipients: 2,
@@ -146,52 +144,63 @@ Output:
   resultmessage: 'Message successfully sent.' }
 ```
 
-## iDEAL
+
+iDEAL
+-----
 
 Mollie provides a simple streamlined method for handling iDEAL payments. For this to work you need to an active payment profile. See the [API documentation](https://www.mollie.nl/beheer/betaaldiensten/documentatie/ideal/en/) for all the details and variables.
 
-## mollie.ideal.banklist
+
+mollie.ideal.banklist
+---------------------
 
 On your payment page you first need to let the customer choose his bank.
 
-**mollie.ideal.banklist ( [testmode], callback )**
+### mollie.ideal.banklist ( [testmode], callback )
 
-* **testmode** - optional - **true**: returns a test-bank, all transactions are fake. **false**: returns real banks, all transactions are real with real money. The *default* is what you set on your account [iDEAL API testmode](https://www.mollie.nl/beheer/betaaldiensten/instellingen/) settings.
+	testmode   optional   true    returns a test-bank, all transactions are fake.
+	                      false   returns real banks, all transactions are real
+	                              with real money.
+	                              The *default* is what you set on your account
+	                              [iDEAL API testmode](https://www.mollie.nl/beheer/betaaldiensten/instellingen/) settings.
+	
+	callback   required           your callback function
 
-* **callback** - required - your callback function
-
-###### Testmode enabled:
+### Testmode enabled:
 
 ```js
-mollie.ideal.banklist( true, console.log );
+mollie.ideal.banklist( true, console.log )
 ```
 
 ```js
-{ '9999': { bank_id: 9999, bank_name: 'TBM Bank' } }
+{ '9999': { bank_id: '9999', bank_name: 'TBM Bank' } }
 ```
 
 The key is the same as **bank_id**, this allows you to do quick reverse lookups.
 
 
-###### Testmode disabled:
+### Testmode disabled:
 
 ```js
-mollie.ideal.banklist( console.log );
+mollie.ideal.banklist( console.log )
 ```
 
 ```js
-{ '17': { bank_id: 17, bank_name: 'Rabobank' },
-  '25': { bank_id: 25, bank_name: 'ABN AMRO' },
-  '91': { bank_id: 91, bank_name: 'Friesland Bank' },
-  '113': { bank_id: 113, bank_name: 'van Lanschot' },
-  '329': { bank_id: 329, bank_name: 'Triodos Bank' },
-  '465': { bank_id: 465, bank_name: 'ING' },
-  '489': { bank_id: 489, bank_name: 'SNS Bank' },
-  '497': { bank_id: 497, bank_name: 'ASN Bank' },
-  '505': { bank_id: 505, bank_name: 'RegioBank' } }
+{ '0031': { bank_id: '0031', bank_name: 'ABN AMRO' },
+  '0761': { bank_id: '0761', bank_name: 'ASN Bank' },
+  '0091': { bank_id: '0091', bank_name: 'Friesland Bank' },
+  '0721': { bank_id: '0721', bank_name: 'ING' },
+  '0801': { bank_id: '0801', bank_name: 'Knab' },
+  '0021': { bank_id: '0021', bank_name: 'Rabobank' },
+  '0771': { bank_id: '0771', bank_name: 'RegioBank' },
+  '0751': { bank_id: '0751', bank_name: 'SNS Bank' },
+  '0511': { bank_id: '0511', bank_name: 'Triodos Bank' },
+  '0161': { bank_id: '0161', bank_name: 'van Lanschot' } }
 ```
 
-## mollie.ideal.payment
+
+mollie.ideal.payment
+--------------------
 
 Create an iDEAL payment.
 
@@ -217,13 +226,14 @@ mollie.ideal.payment(
      message: 'Your iDEAL-payment has successfully been setup. Your customer should visit the given URL to make the payment' } }
 ```
 
-## mollie.ideal.check
+
+mollie.ideal.check
+------------------
 
 When the customer completes the payment the API will make a call on your **reporturl** with the **transaction_id** as **GET** argument. Then you can check the payment status **ONCE** with **mollie.ideal.check**. In the meantime the customer will be redirected to your **returnurl** and bring the **transaction_id** too, for cross-referencing.
 
-* **testmode** - optional - set to *true* when using the TMB Bank (ID 9999).
-
-* **transaction_id** - required - the transaction ID to check
+	testmode         optional   set to _true_ when using the TMB Bank (ID 9999).
+	transaction_id   required   the transaction ID to check
 
 ```js
 mollie.ideal.check(
@@ -251,7 +261,9 @@ mollie.ideal.check(
 
 The variable **payed** can be **true** only once, for security.
 
-## mollie.ideal.paymentLink
+
+mollie.ideal.paymentLink
+------------------------
 
 Generate an iDEAL payment link to redirect the customer to. This is useful for emails and such. This way Mollie will take care of the banklist, payment creation and confirmation.
 
@@ -273,8 +285,34 @@ mollie.ideal.paymentLink(
 
 You get the payment status by email.
 
-## License
 
-This code is **COPYLEFT** meaning you can do anything you like, except copyrighting it. It would be nice to refer back to the source in your code, for future reference:
+Unlicense
+---------
 
-https://github.com/fvdm/nodejs-mollie/
+This is free and unencumbered software released into the public domain.
+
+Anyone is free to copy, modify, publish, use, compile, sell, or
+distribute this software, either in source code form or as a compiled
+binary, for any purpose, commercial or non-commercial, and by any
+means.
+
+In jurisdictions that recognize copyright laws, the author or authors
+of this software dedicate any and all copyright interest in the
+software to the public domain. We make this dedication for the benefit
+of the public at large and to the detriment of our heirs and
+successors. We intend this dedication to be an overt act of
+relinquishment in perpetuity of all present and future rights to this
+software under copyright law.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.
+
+For more information, please refer to <http://unlicense.org/>
+
+This product includes GeoLite2 data created by MaxMind, available from
+<http://www.maxmind.com>

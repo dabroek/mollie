@@ -3,6 +3,7 @@ Name:          nodejs-mollie
 Description:   Node.js module to access the Mollie payments and MessageBird SMS APIs.
 Source:        https://github.com/fvdm/nodejs-mollie
 Feedback:      https://github.com/fvdm/nodejs-mollie/issues
+License:       Public Domain / Unlicense (see UNLICENSE file)
 */
 
 // MODULE

@@ -292,8 +292,8 @@ mollie.talk = function( path, fields, callback ) {
 	})
 	
 	// post and close
-	req.write( query )
-	req.end()
+	request.write( query )
+	request.end()
 	
 }
 

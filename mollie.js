@@ -12,12 +12,10 @@
 
 // MODULE
 
-var	https = require('https'),
-	EventEmitter = require('events').EventEmitter,
-	querystring = require('querystring'),
-	xml2json = require('node-xml2json')
-
-var mollie = new EventEmitter()
+var mollie = {}
+var https = require('https')
+var querystring = require('querystring')
+var xml2json = require('node-xml2json')
 
 mollie.api = {
 	partnerid:	0,
@@ -222,15 +220,14 @@ mollie.ideal = {
 // talk
 mollie.talk = function( path, fields, callback ) {
 	
-	if( !callback && typeof fields == 'function' ) {
-		// fix callback
-		var callback = fields;
-	} else if( typeof fields == 'object' ) {
-		// query string
-		var query = Object.keys(fields).length > 0 ? querystring.stringify( fields ) : ''
+	// fix input
+	if( typeof fields === 'function' ) {
+		var callback = fields
+		var fields = {}
 	}
 	
-	var query = query ? query : ''
+	// query string
+	var query = typeof fields === 'object' ? querystring.stringify( fields ) : ''
 	
 	// build request
 	var req = https.request(

@@ -94,7 +94,7 @@ mollie.paysafecard = {
 		vars.partnerid = mollie.api.partnerid
 		
 		// fix centen
-		if( typeof vars.amount == 'string' && vars.amount.indexOf('.') ) {
+		if( typeof vars.amount === 'string' && vars.amount.indexOf('.') ) {
 			var asplit = vars.amount.split('.')
 			if( asplit[1] !== undefined ) {
 				vars.amount = vars.amount * 100
@@ -122,7 +122,7 @@ mollie.ideal = {
 	// link
 	paymentLink: function( vars, callback ) {
 		
-		vars = typeof vars != 'object' ? {} : vars
+		vars = typeof vars !== 'object' ? {} : vars
 		vars.a = 'create-link'
 		vars.partnerid = mollie.api.partnerid
 		
@@ -143,7 +143,7 @@ mollie.ideal = {
 	// payment
 	payment: function( vars, callback ) {
 		
-		vars = typeof vars != 'object' ? {} : vars
+		vars = typeof vars !== 'object' ? {} : vars
 		vars.a = 'fetch'
 		vars.partnerid = mollie.api.partnerid
 		
@@ -164,7 +164,7 @@ mollie.ideal = {
 	// check
 	check: function( vars, callback ) {
 		
-		vars = typeof vars != 'object' ? {} : vars
+		vars = typeof vars !== 'object' ? {} : vars
 		vars.a = 'check'
 		vars.partnerid = mollie.api.partnerid
 		
@@ -199,7 +199,7 @@ mollie.ideal = {
 		// request
 		mollie.talk( 'ideal', vars, function( res ) {
 			var banks = {}
-			if( typeof res == 'object' && typeof res.bank == 'object' ) {
+			if( typeof res === 'object' && typeof res.bank === 'object' ) {
 				if( res.bank.bank_id === undefined ) {
 					for( var b in res.bank ) {
 						bank = res.bank[b]
@@ -257,7 +257,7 @@ mollie.talk = function( path, fields, callback ) {
 			response.on( 'end', function() {
 				data = xml2json.parser( data )
 				data = data.response
-				if( data.item != undefined ) {
+				if( data.item !== undefined ) {
 					data = data.item
 				}
 				callback( data )

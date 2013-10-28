@@ -1,29 +1,31 @@
 {
-  "author": "Franklin van de Meent <fr@nkl.in> (http://frankl.in)",
-  "name": "mollie",
-  "description": "Access the Mollie API (http://mollie.nl)",
-  "version": "0.1.0",
-  "homepage": "http://fvdm.github.com/nodejs-mollie/",
+  "author": {
+    "name":               "Franklin van de Meent",
+    "email":              "fr@nkl.in",
+    "url":                "http://frankl.in"
+  },
+  "name":                 "mollie",
+  "description":          "Access the Mollie API (http://mollie.nl)",
+  "version":              "1.0.0",
   "repository": {
-    "type": "git",
-    "url": "git://github.com/fvdm/nodejs-mollie.git"
+    "type":               "git",
+    "url":                "git://github.com/fvdm/nodejs-mollie.git"
   },
   "bugs": {
-    "url": "https://github.com/fvdm/nodejs-mollie/issues"
+    "url":                "https://github.com/fvdm/nodejs-mollie/issues"
   },
-  "main": "mollie.js",
+  "main":                 "mollie.js",
   "dependencies": {
-    "node-xml2json": ">=1.0.0 <2.0.0"
+    "node-xml2json":      ">=1.0.0 <2.0.0"
   },
-  "devDependencies": {},
+  "devDependencies":      {},
   "optionalDependencies": {},
   "engines": {
-    "node": "*"
+    "node":               "*"
   },
-  "tags": [
-    "mollie",
-    "api",
-    "sms",
-    "ideal"
-  ]
+  "keywords":             ["mollie", "api", "sms", "ideal"],
+  "license": {
+    "type":               "Public Domain",
+    "url":                "https://github.com/fvdm/nodejs-mollie/raw/master/UNLICENSE"
+  }
 }

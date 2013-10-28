@@ -1,13 +1,8 @@
 /*
-	nodejs-mollie
-	
-	An unofficial Node.js module to access the Mollie API
-	
-	This code is COPYLEFT meaning you can do with it anything you
-	like, except copyrighting it. It would be nice to refer back
-	to the source:
-	
-	https://github.com/fvdm/nodejs-mollie/
+Name:          nodejs-mollie
+Description:   Node.js module to access the Mollie payments and MessageBird SMS APIs.
+Source:        https://github.com/fvdm/nodejs-mollie
+Feedback:      https://github.com/fvdm/nodejs-mollie/issues
 */
 
 // MODULE

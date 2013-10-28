@@ -299,8 +299,7 @@ mollie.talk = function( path, fields, callback ) {
 	})
 	
 	// post and close
-	request.write( query )
-	request.end()
+	request.end( query )
 	
 }
 

@@ -282,7 +282,7 @@ mollie.ideal.check(
    { transaction_id: 'abcxyz',
      amount: 2000,
      currency: 'EUR',
-     payed: 'true',
+     payed: true,
      consumer: 
       { consumername: 'T. TEST',
         consumeraccount: 123456789,

@@ -8,8 +8,10 @@ License:        Unlicense (Public Domain, see UNLICENSE file)
 
 // Setup
 // $ env MOLLIE_APIKEY=secret npm test
-var Mollie = require ('./');
-var mollie = new Mollie ({ apikey: process.env.MOLLIE_APIKEY });
+var mollie = require ('./') ({
+  apikey: process.env.MOLLIE_APIKEY || null,
+  timeout: process.env.MOLLIE_TIMEOUT || 5000
+});
 
 var errors = 0;
 var queue = [];

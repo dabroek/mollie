@@ -93,11 +93,18 @@ module.exports = function (config) {
       this.httpRequest ('GET', '/payments/' + paymentId + '/refunds', params, callback);
     },
 
-    create: function (paymentId, params, callback) {
-      if (typeof params === 'function') {
-        callback = params;
-        params = {};
+    create: function (paymentId, amount, callback) {
+      var params = {};
+
+      if (typeof amount === 'function') {
+        callback = amount;
+        amount = null;
       }
+
+      if (amount) {
+        params.amount = amount;
+      }
+
       this.httpRequest ('POST', '/payments/' + paymentId + '/refunds', params, callback);
     },
 

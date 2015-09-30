@@ -135,6 +135,6 @@ module.exports = function (config) {
       }
       this.httpRequest ('GET', '/methods', params, callback);
     }
-  }
+  };
 };
 

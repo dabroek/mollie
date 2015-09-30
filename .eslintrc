@@ -109,7 +109,7 @@
       "objectsInObjects": false,
       "arraysInObjects": false
     }],
-    "one-var": [2, "always"],
+    "one-var": [2, "never"],
     "operator-assignment": [2, "always"],
     "operator-linebreak": [2, "none"],
     "padded-blocks": [2, "never"],

@@ -2,11 +2,13 @@
   "author": {
     "name":               "Franklin van de Meent",
     "email":              "fr@nkl.in",
-    "url":                "http://frankl.in"
+    "url":                "https://frankl.in"
   },
   "name":                 "mollie",
-  "description":          "Access the Mollie API (http://mollie.nl)",
-  "version":              "1.0.0",
+  "description":          "Process payments with Mollie (unofficial}",
+  "version":              "2.0.0",
+  "main":                 "mollie.js",
+  "license":              "Unlicense",
   "repository": {
     "type":               "git",
     "url":                "git://github.com/fvdm/nodejs-mollie.git"
@@ -14,18 +16,29 @@
   "bugs": {
     "url":                "https://github.com/fvdm/nodejs-mollie/issues"
   },
-  "main":                 "mollie.js",
+  "engines": {
+    "node":               ">=0.8.0"
+  },
   "dependencies": {
-    "node-xml2json":      ">=1.0.0 <2.0.0"
+    "httpreq":            "0.4.x"
   },
   "devDependencies":      {},
   "optionalDependencies": {},
-  "engines": {
-    "node":               "*"
-  },
-  "keywords":             ["mollie", "api", "sms", "ideal"],
-  "license": {
-    "type":               "Public Domain",
-    "url":                "https://github.com/fvdm/nodejs-mollie/raw/master/UNLICENSE"
-  }
+  "keywords": [
+    "mollie",
+    "payment",
+    "payments",
+    "banking",
+    "bancontact",
+    "belfius",
+    "bitcoin",
+    "creditcard",
+    "ideal",
+    "incasso",
+    "mistercash",
+    "paypal",
+    "paysafecard",
+    "sepa",
+    "sofort"
+  ]
 }

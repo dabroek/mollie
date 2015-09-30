@@ -87,7 +87,7 @@ var Mollie = function (config) {
   this.refunds = {
     list: function (paymentId, params, callback) {
       fixcbparams ();
-      this.talk ('GET', '/payments/' + paymentId + '/refunds', {}, callback);
+      this.talk ('GET', '/payments/' + paymentId + '/refunds', params, callback);
     },
 
     create: function (paymentId, params, callback) {

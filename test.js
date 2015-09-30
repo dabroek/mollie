@@ -80,8 +80,8 @@ function doTest (err, label, tests) {
 
 
 queue.push (function () {
-  mollie.methods (function (err, res) {
-    doTest (err, 'methods', [
+  mollie.methods.list (function (err, res) {
+    doTest (err, 'methods.list', [
       ['type', res instanceof Object],
       ['data', res && res.data instanceof Object]
     ]);

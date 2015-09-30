@@ -127,12 +127,14 @@ module.exports = function (config) {
     }
   };
 
-  this.methods = function (params, callback) {
-    if (typeof params === 'function') {
-      callback = params;
-      params = {};
+  this.methods = {
+    list: function (params, callback) {
+      if (typeof params === 'function') {
+        callback = params;
+        params = {};
+      }
+      this.httpRequest ('GET', '/methods', params, callback);
     }
-    this.httpRequest ('GET', '/methods', params, callback);
-  };
+  }
 };
 

@@ -94,10 +94,7 @@ function doTest (err, label, tests) {
 
 queue.push (function () {
   mollie.payments.create (cache.payment, function (err, data) {
-    if (data) {
-      cache.payment = data;
-    }
-
+    cache.payment = data;
     doTest (err, 'payments.create', [
       ['type', data instanceof Object]
     ]);

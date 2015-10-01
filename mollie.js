@@ -77,7 +77,7 @@ module.exports = function (config) {
       get: function (id, callback) {
         talk ('GET', '/payments/' + id, {}, callback);
       },
-  
+
       list: function (params, callback) {
         if (typeof params === 'function') {
           callback = params;
@@ -85,7 +85,7 @@ module.exports = function (config) {
         }
         talk ('GET', '/payments', params, callback);
       },
-  
+
       create: function (params, callback) {
         var key;
 
@@ -100,7 +100,7 @@ module.exports = function (config) {
         talk ('POST', '/payments', params, callback);
       }
     },
-  
+
     refunds: {
       list: function (paymentId, params, callback) {
         if (typeof params === 'function') {
@@ -109,32 +109,32 @@ module.exports = function (config) {
         }
         talk ('GET', '/payments/' + paymentId + '/refunds', params, callback);
       },
-  
+
       create: function (paymentId, amount, callback) {
         var params = {};
-  
+
         if (typeof amount === 'function') {
           callback = amount;
           amount = null;
         }
-  
+
         if (amount) {
           params.amount = amount;
         }
-  
+
         talk ('POST', '/payments/' + paymentId + '/refunds', params, callback);
       },
-  
+
       delete: function (paymentId, refundId, callback) {
         talk ('DELETE', '/payments/' + paymentId + '/refunds/' + refundId, {}, callback);
       }
     },
-  
+
     issuers: {
       get: function (issuerId, callback) {
         talk ('GET', '/issuers/' + issuerId, {}, callback);
       },
-  
+
       list: function (params, callback) {
         if (typeof params === 'function') {
           callback = params;
@@ -143,7 +143,7 @@ module.exports = function (config) {
         talk ('GET', '/issuers', params, callback);
       }
     },
-  
+
     methods: {
       list: function (params, callback) {
         if (typeof params === 'function') {

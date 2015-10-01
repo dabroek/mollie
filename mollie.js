@@ -62,14 +62,14 @@ function talk (method, path, params, callback) {
 
 
 module.exports = function (config) {
-  var key;
+  var ckey;
 
   if (typeof config !== 'object') {
     return null;
   }
 
-  for (key in config) {
-    settings [key] = config [key];
+  for (ckey in config) {
+    settings [ckey] = config [ckey];
   }
 
   return {

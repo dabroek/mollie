@@ -1,5 +1,6 @@
 /*
 Name:           mollie - test.js
+Description:    Node.js module to access the Mollie payments API
 Author:         Franklin van de Meent (https://frankl.in)
 Source & docs:  https://github.com/fvdm/nodejs-mollie
 Feedback:       https://github.com/fvdm/nodejs-mollie/issues

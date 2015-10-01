@@ -1,9 +1,10 @@
 /*
-Name:          nodejs-mollie
-Description:   Node.js module to access the Mollie payments and MessageBird SMS APIs.
-Source:        https://github.com/fvdm/nodejs-mollie
-Feedback:      https://github.com/fvdm/nodejs-mollie/issues
-License:       Public Domain / Unlicense (see UNLICENSE file)
+Name:           mollie
+Description:    Node.js module to access the Mollie payments API
+Author:         Franklin van de Meent (https://frankl.in)
+Source & docs:  https://github.com/fvdm/nodejs-mollie
+Feedback:       https://github.com/fvdm/nodejs-mollie/issues
+License:        Public Domain / Unlicense (see UNLICENSE file)
 */
 
 var httpreq = require ('httpreq');

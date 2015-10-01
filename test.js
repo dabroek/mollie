@@ -17,6 +17,17 @@ var errors = 0;
 var queue = [];
 var next = 0;
 
+var cache = {
+  payment: {
+    amount: 12.34,
+    description: 'Order #112233',
+    redirectUrl: 'https://mywebshop.tld/order/112233',
+    metadata: {
+      order_id: 112233
+    }
+  }
+};
+
 
 // handle exits
 process.on ('exit', function () {

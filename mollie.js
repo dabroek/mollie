@@ -26,7 +26,7 @@ function talk (method, path, params, callback) {
   };
 
   httpreq.doRequest (options, function (err, res) {
-    var data = res && res.body || null;
+    var data = null;
     var error = null;
 
     if (err) {
@@ -36,12 +36,14 @@ function talk (method, path, params, callback) {
       return;
     }
 
-    if (res && res.statusCode === 204) {
+    data = res.body;
+
+    if (res.statusCode === 204) {
       callback (null, true);
       return;
     }
 
-    if (method === 'DELETE' && res && res.statusCode === 404) {
+    if (method === 'DELETE' && res.statusCode === 404) {
       callback (null, false);
       return;
     }

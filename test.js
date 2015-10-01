@@ -21,6 +21,7 @@ var next = 0;
 
 var cache = {
   payment: {
+    mode: 'test',
     amount: 12.34,
     description: 'Order #112233',
     redirectUrl: 'https://mywebshop.tld/order/112233',

@@ -138,20 +138,38 @@ queue.push (function () {
 
 queue.push (function () {
   mollie.refunds.create (cache.payment.id, 5, function (err, data) {
-    cache.refund = data;
-    doTest (err, 'refunds.create option', [
-      ['type', data instanceof Object]
-    ]);
+    if (keytype === 'live') {
+      cache.refund = data;
+      doTest (err, 'refunds.create option', [
+        ['type', data instanceof Object]
+      ]);
+    } else {
+      doTest (null, 'refunds.create option', [
+        ['type', err instanceof Error],
+        ['message', err.message === 'API error'],
+        ['code', err.statusCode === 422],
+        ['error', err && err.error instanceof Object]
+      ]);
+    }
   });
 });
 
 
 queue.push (function () {
   mollie.refunds.create (cache.payment.id, function (err, data) {
-    cache.refund = data;
-    doTest (err, 'refunds.create normal', [
-      ['type', data instanceof Object]
-    ]);
+    if (keytype === 'live') {
+      cache.refund = data;
+      doTest (err, 'refunds.create normal', [
+        ['type', data instanceof Object]
+      ]);
+    } else {
+      doTest (null, 'refunds.create normal', [
+        ['type', err instanceof Error],
+        ['message', err.message === 'API error'],
+        ['code', err.statusCode === 422],
+        ['error', err && err.error instanceof Object]
+      ]);
+    }
   });
 });
 
@@ -160,31 +178,38 @@ queue.push (function () {
   mollie.refunds.list (cache.payment.id, function (err, data) {
     doTest (err, 'refunds.list normal', [
       ['type', data instanceof Object],
-      ['data', data && data.data instanceof Array],
-      ['item', data && data.data && data.data [0] instanceof Object]
+      ['data', data && data.data instanceof Array]
     ]);
   });
 });
 
 
 queue.push (function () {
-  mollie.refunds.list ({ offset: 0, count: 10 }, function (err, data) {
+  mollie.refunds.list (cache.payment.id, { offset: 0, count: 10 }, function (err, data) {
     doTest (err, 'refunds.list option', [
       ['type', data instanceof Object],
-      ['data', data && data.data instanceof Array],
-      ['item', data && data.data && data.data [0] instanceof Object]
+      ['data', data && data.data instanceof Array]
     ]);
   });
 });
 
 
 queue.push (function () {
-  mollie.refunds.delete (cache.payment.id, cache.refund.id, function (err, data) {
-    doTest (err, 'refunds.delete', [
-      ['type', typeof data === 'boolean'],
-      ['data', data === true]
-    ]);
-  });
+  if (keytype === 'live') {
+    mollie.refunds.delete (cache.payment.id, cache.refund.id, function (err, data) {
+      doTest (err, 'refunds.delete', [
+        ['type', typeof data === 'boolean'],
+        ['data', data === true]
+      ]);
+    });
+  } else {
+    mollie.refunds.delete (cache.payment.id, 1, function (err, data) {
+      doTest (err, 'refunds.delete', [
+        ['type', typeof data === 'boolean'],
+        ['data', data === false]
+      ]);
+    });
+  }
 });
 
 

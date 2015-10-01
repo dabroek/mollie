@@ -8,6 +8,8 @@ License:        Unlicense (Public Domain, see UNLICENSE file)
 
 // Setup
 // $ env MOLLIE_APIKEY=secret npm test
+var pkg = require ('./package.json');
+
 var mollie = require ('./') ({
   apikey: process.env.MOLLIE_APIKEY || null,
   timeout: process.env.MOLLIE_TIMEOUT || 5000
@@ -101,5 +103,9 @@ queue.push (function () {
 
 
 // Start the tests
-console.log ('Running tests...\n');
+console.log ('Running tests...');
+console.log ('Node.js v' + process.versions.node);
+console.log ('Module  v' + pkg.version);
+console.log ();
+
 queue [0] ();

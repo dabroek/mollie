@@ -50,7 +50,7 @@ Error handling
 --------------
 
 The callbacks receive two parameters, `err` and `data`.
-When an error occurs `err` is an instance of `Error` with stack trace and additional properties, `data` will be not be available.
+When an error occurs `err` is an instance of `Error` with stack trace and additional properties, `data` will not be available.
 On success `err` is _null_ and `data` is the parsed API response.
 
 

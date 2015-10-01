@@ -41,6 +41,11 @@ function talk (method, path, params, callback) {
       return;
     }
 
+    if (method === 'DELETE' && res && res.statusCode === 404) {
+      callback (null, false);
+      return;
+    }
+
     try {
       data = JSON.parse (data);
     } catch (e) {

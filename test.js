@@ -92,10 +92,118 @@ function doTest (err, label, tests) {
 
 
 queue.push (function () {
-  mollie.methods.list (function (err, res) {
+  mollie.payments.create (cache.payment, function (err, data) {
+    if (data) {
+      cache.payment = data;
+    }
+
+    doTest (err, 'payments.create', [
+      ['type', data instanceof Object]
+    ]);
+  });
+});
+
+
+queue.push (function () {
+  mollie.payments.list (function (err, data) {
+    doTest (err, 'payments.list normal', [
+      ['type', data instanceof Object],
+      ['data', data && data.data instanceof Array],
+      ['item', data && data.data && data.data [0] instanceof Object]
+    ]);
+  });
+});
+
+
+queue.push (function () {
+  mollie.payments.list ({ offset: 0, count: 10 }, function (err, data) {
+    doTest (err, 'payments.list option', [
+      ['type', data instanceof Object],
+      ['data', data && data.data instanceof Array],
+      ['item', data && data.data && data.data [0] instanceof Object]
+    ]);
+  });
+});
+
+
+queue.push (function () {
+  mollie.payments.get (cache.payment.id, function (err, data) {
+    doTest (err, 'payments.get', [
+      ['type', data instanceof Object]
+    ]);
+  });
+});
+
+
+queue.push (function () {
+  mollie.refunds.create (cache.payment.id, 5, function (err, data) {
+    cache.refund = data;
+    doTest (err, 'refunds.create option', [
+      ['type', data instanceof Object]
+    ]);
+  });
+});
+
+
+queue.push (function () {
+  mollie.refunds.create (cache.payment.id, function (err, data) {
+    cache.refund = data;
+    doTest (err, 'refunds.create normal', [
+      ['type', data instanceof Object]
+    ]);
+  });
+});
+
+
+queue.push (function () {
+  mollie.refunds.list (cache.payment.id, function (err, data) {
+    doTest (err, 'refunds.list normal', [
+      ['type', data instanceof Object],
+      ['data', data && data.data instanceof Array],
+      ['item', data && data.data && data.data [0] instanceof Object]
+    ]);
+  });
+});
+
+
+queue.push (function () {
+  mollie.refunds.list ({ offset: 0, count: 10 }, function (err, data) {
+    doTest (err, 'refunds.list option', [
+      ['type', data instanceof Object],
+      ['data', data && data.data instanceof Array],
+      ['item', data && data.data && data.data [0] instanceof Object]
+    ]);
+  });
+});
+
+
+queue.push (function () {
+  mollie.refunds.delete (cache.payment.id, cache.refund.id, function (err, data) {
+    doTest (err, 'refunds.delete', [
+      ['type', typeof data === 'boolean'],
+      ['data', data === true]
+    ]);
+  });
+});
+
+
+queue.push (function () {
+  mollie.methods.list (function (err, data) {
     doTest (err, 'methods.list', [
-      ['type', res instanceof Object],
-      ['data', res && res.data instanceof Object]
+      ['type', data instanceof Object],
+      ['data', data && data.data instanceof Array],
+      ['item', data && data.data && data.data [0] instanceof Object]
+    ]);
+  });
+});
+
+
+queue.push (function () {
+  mollie.methods.list (function (err, data) {
+    doTest (err, 'methods.list', [
+      ['type', data instanceof Object],
+      ['data', data && data.data instanceof Array],
+      ['item', data && data.data && data.data [0] instanceof Object]
     ]);
   });
 });

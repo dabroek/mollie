@@ -1,7 +1,7 @@
 mollie
 ======
 
-Node.js module to access the Mollie payments API.
+Unofficial Node.js module to access the Mollie payments API.
 
 [![Build Status](https://travis-ci.org/fvdm/nodejs-mollie.svg?branch=master)](https://travis-ci.org/fvdm/nodejs-mollie)
 

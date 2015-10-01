@@ -1,345 +1,166 @@
 /*
-Name:          nodejs-mollie
-Description:   Node.js module to access the Mollie payments and MessageBird SMS APIs.
-Source:        https://github.com/fvdm/nodejs-mollie
-Feedback:      https://github.com/fvdm/nodejs-mollie/issues
-License:       Public Domain / Unlicense (see UNLICENSE file)
+Name:           mollie
+Description:    Node.js module to access the Mollie payments API
+Author:         Franklin van de Meent (https://frankl.in)
+Source & docs:  https://github.com/fvdm/nodejs-mollie
+Feedback:       https://github.com/fvdm/nodejs-mollie/issues
+License:        Public Domain / Unlicense (see UNLICENSE file)
 */
 
-// MODULE
+var httpreq = require ('httpreq');
+var settings = {
+  apikey: null,
+  timeout: 5000
+};
 
-var mollie = {}
-var https = require('https')
-var querystring = require('querystring')
-var xml2json = require('node-xml2json')
+function talk (method, path, params, callback) {
+  var options = {
+    url: 'https://api.mollie.nl/v1' + path,
+    method: method,
+    parameters: params || null,
+    timeout: parseInt (settings.timeout, 10) || 5000,
+    headers: {
+      'Accept': 'application/json',
+      'Authorization': 'Bearer ' + settings.apikey,
+      'User-Agent': 'mollie.js (https://www.npmjs.com/package/mollie)'
+    }
+  };
 
-mollie.api = {
-	partnerid:	0,
-	username:	'',
-	password: 	''
-}
+  httpreq.doRequest (options, function (err, res) {
+    var data = null;
+    var error = null;
 
-// Padding for the four digit bank_ids 
-String.prototype.lpad = function( chr, count ) {
-	var str = this
-	while( str.length < count ) {
-		str = chr + str
-	}
-	return str
-}
+    if (err) {
+      error = new Error ('request failed');
+      error.error = err;
+      callback (error);
+      return;
+    }
 
-// Account credits
-mollie.credits = function( callback ) {
-	mollie.talk(
-		'credits',
-		{
-			username:	mollie.api.username,
-			password:	mollie.api.password
-		},
-		callback
-	)
-}
+    data = res.body;
 
+    if (res.statusCode === 204) {
+      callback (null, true);
+      return;
+    }
 
-// HLR-lookup (Network Query)
-// https://www.mollie.nl/beheer/sms-diensten/documentatie/hlr/
-// Codes: http://en.wikipedia.org/wiki/Mobile_Network_Code
-mollie.hlr = function( vars, callback ) {
-	vars.username = mollie.api.username
-	vars.password = mollie.api.password
-	mollie.talk( 'hlr', vars, callback )
-}
+    if (method === 'DELETE' && res.statusCode === 404) {
+      callback (null, false);
+      return;
+    }
 
+    try {
+      data = JSON.parse (data);
+    } catch (e) {
+      error = new Error ('invalid response');
+      error.error = e;
+      error.statusCode = res && res.statusCode || null;
+    }
 
-// SMS
-// Normal: https://www.mollie.nl/beheer/sms-diensten/documentatie/sms/http/
-// Premium: https://www.mollie.nl/beheer/sms-diensten/documentatie/sms/http/?s=premium
-mollie.sms = function( vars, callback ) {
-	vars.username = mollie.api.username
-	vars.password = mollie.api.password
-	mollie.talk( 'sms', vars, callback )
-}
+    if (data && data.error) {
+      error = new Error ('API error');
+      error.error = data.error;
+      error.statusCode = res && res.statusCode || null;
+      data = null;
+    }
 
-
-// Phone / IVR / 090x
-// https://www.mollie.nl/beheer/betaaldiensten/documentatie/ivr/
-mollie.ivr = {
-	
-	// payment
-	payment: function( vars, callback ) {
-		
-		vars.a = 'fetch'
-		vars.partnerid = mollie.api.partnerid
-		mollie.talk( 'micropayment', vars, callback )
-		
-	},
-	
-	// check
-	check: function( vars, callback ) {
-		
-		vars.a = 'check'
-		mollie.talk( 'micropayment', vars, callback )
-		
-	}
-	
+    callback (error, data);
+  });
 }
 
 
+module.exports = function (config) {
+  var ckey;
 
-// paysafecard
-// https://www.mollie.nl/beheer/betaaldiensten/documentatie/paysafecard/
-mollie.paysafecard = {
-	
-	// prepare
-	prepare: function( vars, callback ) {
-		
-		vars.partnerid = mollie.api.partnerid
-		
-		// fix centen
-		if( typeof vars.amount === 'string' && vars.amount.indexOf('.') ) {
-			var asplit = vars.amount.split('.')
-			if( asplit[1] !== undefined ) {
-				vars.amount = vars.amount * 100
-			}
-		}
-		
-		mollie.talk( 'paysafecard/prepare', vars, callback )
-		
-	},
-	
-	
-	// status
-	status: function( vars, callback ) {
-		vars.partnerid = mollie.api.partnerid
-		mollie.talk( 'paysafecard/check-status', vars, callback )
-	}
-	
-}
+  if (typeof config !== 'object') {
+    return null;
+  }
 
+  for (ckey in config) {
+    settings [ckey] = config [ckey];
+  }
 
-// iDEAL
-// https://www.mollie.nl/beheer/betaaldiensten/documentatie/ideal/
-mollie.ideal = {
-	
-	// link
-	paymentLink: function( vars, callback ) {
-		
-		vars = typeof vars !== 'object' ? {} : vars
-		vars.a = 'create-link'
-		vars.partnerid = mollie.api.partnerid
-		
-		// fix centen
-		if( typeof vars.amount == 'string' && vars.amount.indexOf('.') ) {
-			var asplit = vars.amount.split('.')
-			if( asplit[1] !== undefined ) {
-				vars.amount = vars.amount * 100
-			}
-		}
-		
-		// post
-		mollie.talk( 'ideal', vars, callback )
-		
-	},
-	
-	
-	// payment
-	payment: function( vars, callback ) {
-		
-		vars = typeof vars !== 'object' ? {} : vars
-		vars.a = 'fetch'
-		vars.partnerid = mollie.api.partnerid
-		
-		// fix centen
-		if( typeof vars.amount == 'string' && vars.amount.indexOf('.') ) {
-			var asplit = vars.amount.split('.')
-			if( asplit[1] !== undefined ) {
-				vars.amount = vars.amount * 100
-			}
-		}
-		
-		// post
-		mollie.talk( 'ideal', vars, callback )
-		
-	},
-	
-	
-	// check
-	check: function( vars, callback ) {
-		
-		vars = typeof vars !== 'object' ? {} : vars
-		vars.a = 'check'
-		vars.partnerid = mollie.api.partnerid
-		
-		// fix testmode
-		if( vars.testmode !== undefined ) {
-			vars.testmode = vars.testmode === true || vars.testmode === 'true' ? 'true' : 'false'
-		}
-		
-		// request
-		mollie.talk( 'ideal', vars, function( err, res ) {
-			if( err ) {
-				callback( err )
-			} else {
-				res = res.order
-				res.payed = res.payed === 'true' ? true : false
-				if( res.consumer && res.consumer.consumercity === 'NOT PROVIDED' ) {
-					res.consumer.consumercity = null
-				}
-				callback( null, res )
-			}
-		})
-		
-	},
-	
-	// banklist
-	banklist: function( testmode, callback ) {
-		
-		// fix callback
-		if( callback === undefined ) {
-			var callback = testmode
-			testmode = -1
-		}
-		
-		// vars
-		var vars = {
-			a: 'banklist'
-		}
-		
-		if( testmode !== -1 ) {
-			vars.testmode = testmode ? 'true' : 'false'
-		}
-		
-		// request
-		mollie.talk( 'ideal', vars, function( err, res ) {
-			if( err ) {
-				callback( err )
-			} else {
-				var banks = {}
-				if( res && res.bank ) {
-					if( res.bank.bank_id === undefined ) {
-						for( var b in res.bank ) {
-							bank = res.bank[b]
-							bank.bank_id = bank.bank_id.toString()
-							if( bank.bank_id.length < 4 ) {
-								bank.bank_id = bank.bank_id.lpad( "0", 4 )
-							}
-							banks[ bank.bank_id ] = bank
-						}
-					} else {
-						res.bank.bank_id = res.bank.bank_id.toString()
-						if( res.bank.bank_id.length < 4 ) {
-							res.bank.bank_id = res.bank.bank_id.lpad( "0", 4 )
-						}
-						banks[ res.bank.bank_id ] = res.bank
-					}
-				}
-				callback( null, banks )
-			}
-		})
-	}
-}
+  return {
+    payments: {
+      get: function (id, callback) {
+        talk ('GET', '/payments/' + id, {}, callback);
+      },
 
+      list: function (params, callback) {
+        if (typeof params === 'function') {
+          callback = params;
+          params = {};
+        }
+        talk ('GET', '/payments', params, callback);
+      },
 
-// talk
-mollie.talk = function( path, fields, callback ) {
-	
-	// fix input
-	if( typeof fields === 'function' ) {
-		var callback = fields
-		var fields = {}
-	}
-	
-	// prevent multiple callbacks
-	var complete = false
-	function doCallback( err, res ) {
-		if( ! complete ) {
-			complete = true
-			callback( err, res )
-		}
-	}
-	
-	// query string
-	var query = typeof fields === 'object' ? querystring.stringify( fields ) : ''
-	
-	// build request
-	var options = {
-		host: 'www.mollie.nl',
-		port: 443,
-		path: '/xml/'+ path,
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/x-www-form-urlencoded',
-			'Content-Length': query.length
-		}
-	}
-	
-	var request = https.request( options )
-	
-	// response
-	request.on( 'response', function( response ) {
-		var data = []
-		var size = 0
-		
-		response.on( 'data', function( chunk ) {
-			data.push(chunk)
-			size += chunk.length
-		})
-		
-		response.on( 'close', function() {
-			doCallback( new Error('disconnected') )
-		})
-		
-		response.on( 'end', function() {
-			var error = null
-			
-			// combine chunks
-			var buf = new Buffer(size)
-			var pos = 0
-			for( var d in data ) {
-				data[d].copy( buf, pos )
-				pos += data[d].length
-			}
-			
-			data = data.toString('utf8').trim()
-			
-			// process response
-			if( data === '' ) {
-				error = new Error('no response data')
-			} else {
-				// Remove leading zero's in bank_id's so xml2json won't parse
-				// then as octal numbers:
-				data = data.replace( />0+(\d+)</g, ">$1<" )
-				
-				data = xml2json.parser( data.trim() )
-				data = data.response
-				
-				if( data.item !== undefined ) {
-					data = data.item
-				}
-				
-				// catch API errors
-				if( data.resultcode > 10 || data.type === 'error' ) {
-					error = new Error('API error')
-					error.code = data.resultcode || data.errorcode
-					error.error = data.resultmessage || data.message
-				}
-			}
-			
-			// return result
-			doCallback( error, data )
-		})
-	})
-	
-	request.on( 'error', function( error ) {
-		var err = new Error('request failed')
-		err.error = error
-		doCallback( err )
-	})
-	
-	// post and close
-	request.end( query )
-	
-}
+      create: function (params, callback) {
+        var key;
 
-// ready
-module.exports = mollie
+        if (params.metadata instanceof Object) {
+          for (key in params.metadata) {
+            params ['metadata[' + key + ']'] = params.metadata [key];
+          }
+
+          delete params.metadata;
+        }
+
+        talk ('POST', '/payments', params, callback);
+      }
+    },
+
+    refunds: {
+      list: function (paymentId, params, callback) {
+        if (typeof params === 'function') {
+          callback = params;
+          params = {};
+        }
+        talk ('GET', '/payments/' + paymentId + '/refunds', params, callback);
+      },
+
+      create: function (paymentId, amount, callback) {
+        var params = {};
+
+        if (typeof amount === 'function') {
+          callback = amount;
+          amount = null;
+        }
+
+        if (amount) {
+          params.amount = amount;
+        }
+
+        talk ('POST', '/payments/' + paymentId + '/refunds', params, callback);
+      },
+
+      delete: function (paymentId, refundId, callback) {
+        talk ('DELETE', '/payments/' + paymentId + '/refunds/' + refundId, {}, callback);
+      }
+    },
+
+    issuers: {
+      get: function (issuerId, callback) {
+        talk ('GET', '/issuers/' + issuerId, {}, callback);
+      },
+
+      list: function (params, callback) {
+        if (typeof params === 'function') {
+          callback = params;
+          params = {};
+        }
+        talk ('GET', '/issuers', params, callback);
+      }
+    },
+
+    methods: {
+      list: function (params, callback) {
+        if (typeof params === 'function') {
+          callback = params;
+          params = {};
+        }
+        talk ('GET', '/methods', params, callback);
+      }
+    }
+  };
+};
+

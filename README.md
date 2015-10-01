@@ -1,321 +1,290 @@
-nodejs-mollie
-=============
+mollie
+======
 
-Node.js module to access the [Mollie](https://www.mollie.nl/) / [MessageBird](https://www.messagebird.com/) API.
+Unofficial Node.js module to access the Mollie payments API.
+
+[![Build Status](https://travis-ci.org/fvdm/nodejs-mollie.svg?branch=master)](https://travis-ci.org/fvdm/nodejs-mollie)
 
 
-Dependencies
-------------
+* [Node.js](https://nodejs.org)
+* [Mollie](https://www.mollie.com)
+* [API documentation](https://www.mollie.com/en/docs)
 
-* [node-xml2json](http://search.npmjs.org/#/node-xml2json) ([github](https://github.com/Kenshin/node-xml2json/)) - This xml2json module is very light and fast.
+
+Example
+-------
+
+Create a payment for order 112233 at €12.34, return the `paymentUrl` to the customer.
+
+```js
+var mollie = require ('mollie') ('test_apikey');
+
+var payment = {
+  amount: 12.34,
+  description: 'Order #112233',
+  redirectUrl: 'https://mywebshop.tld/order/112233',
+  metadata: {
+    order_id: 112233
+  }
+};
+
+mollie.payments.create (payment, function (err, data) {
+  if (err) { return console.log (err); }
+
+  // i.e. redirect the user
+  tellCustomer (data.links.paymentUrl);
+});
+```
 
 
 Installation
 ------------
 
-Installation is straightforward with NPM, this will take care of any dependencies. The release on NPM is always the latest stable version.
+To use this module you need an [API key](https://www.mollie.com/beheer/account/profielen/) from your Mollie account.
+It is recommended to use your **test** API key during development.
 
-	npm install mollie
-
-You can also download directly from the Github repository, but this can be *unstable*.
-
-	npm install git+https://github.com/fvdm/nodejs-mollie
+`npm install mollie`
 
 
 Error handling
 --------------
 
-The callbacks receive two parameters. This first is `err`: either `null` or `instanceof Error` when something went wrond. The second is `data` with the response.
+The callbacks receive two parameters, `err` and `data`.
+When an error occurs `err` is an instance of `Error` with stack trace and additional properties, `data` will be not be available.
+On success `err` is _null_ and `data` is the parsed API response.
 
 
-### Example
+#### Example
 
 ```js
-function myCallback( err, data ) {
-	if( err ) {
-		console.log( err )
-	} else {
-		console.log( data.credits )
-	}
+function myCallback (err, data) {
+  if (err) {
+    console.log (err);
+  } else {
+    console.log (data.credits);
+  }
 }
+
+mollie.methods (myCallback);
 ```
 
 
-### Errors
+#### Errors
 
-	Error: request failed     The request can't be made, see `err.error`
-	Error: disconnected       The API closed the connection too early.
-	Error: no response data   The API response was completely empty.
-	Error: API error          The API return an error, see `err.error` and `err.code`.
-
+message          | description                         | properties
+:----------------|:------------------------------------|:---------------------
+request failed   | The request can not be made         | `error`
+invalid response | The API response can't be processed | `error`, `statusCode`
+API error        | The API returned an error           | `error`, `statusCode`
 
 
 Usage
 -----
 
-### Setup
+### payments.create
 
-To use account specific functions you need to specify your credentials in the **api** var. In your [account settings](https://www.mollie.nl/beheer/sms-diensten/instellingen/) you can set a password for the HTTP-API that can be different from your regular password. Communication with the API is always over HTTPS. The **api** setting takes these elements:
+**( params, callback )**
 
-* **partnerid** - customer ID, required for payments ([lookup](https://www.mollie.nl/beheer/account/))
-
-* **username** - your account username
-
-* **password** - your account or HTTP-API password
+Create a payment.
 
 
-### Example
+argument | type     | required | description
+:--------|:---------|:---------|:-----------------
+params   | object   | yes      | [Payment-object](https://www.mollie.com/en/docs/payments#payment-object)
+callback | function | yes      | Callback function
 
-Below is a very basic example, including setup and call.
 
 ```js
-var mollie = require('mollie')
+var paymentObject = {
+  amount: 12.34,
+  description: 'Order #112233',
+  redirectUrl: 'https://mywebshop.tld/order/112233',
+  metadata: {
+    order_id: 112233
+  }
+};
 
-// account credentials
-mollie.api.partnerid = 1234
-mollie.api.username = 'yourname'
-mollie.api.password = 'yourapipass'
-
-// get remaining credits
-mollie.credits( console.log )
-```
-
-Output:
-
-```js
-{ type: 'credits',
-  resultcode: 10,
-  resultmessage: 'Credits available.',
-  credits: 58.85,
-  euro: 0 }
-```
-
-Or in case of an error
-
-```js
-{ [Error: API error] code: 30,
-  error: 'Incorrect username or password.' }
+mollie.payments.create (paymentObject, callback);
 ```
 
 
-mollie.credits
---------------
-
-Get remaining account credits
-
-```js
-mollie.credits( console.log )
-```
-```js
-{ type: 'credits',
-  resultcode: 10,
-  resultmessage: 'Credits available.',
-  credits: 58.85,
-  euro: 0 }
-```
+[API documentation](https://www.mollie.com/en/docs/payments#payment-create)
 
 
-mollie.hlr
-----------
+### payments.list
 
-**HLR-lookup (Network Query)**
+**( [params], callback )**
 
-Request the MNC network code for a number. A complete list with the codes can be found at [Wikipedia](http://en.wikipedia.org/wiki/Mobile_Network_Code). The response will be pushed to your HLR report URL as provided on your [SMS settings page](https://www.mollie.nl/beheer/sms-diensten/instellingen/).
+List payments in your account.
 
-	reference    Your internal reference ID for this lookup, will
-	             be included in the report callback.
-	
-	recipients   The number to lookup in international format,
-	             digits only. Although the name is plural, provide
-	             only _one_ number for each call.
+
+argument | type     | required | description
+:--------|:---------|:---------|:--------------------------------
+params   | object   | no       | Pagination, `count` and `offset`
+callback | function | yes      | Callback function
+
 
 ```js
-mollie.hlr(
-	{
-		recipients: 31612345678,
-		reference:  'lookup123'
-	},
-	console.log
-)
-```
+// Just recent
+mollie.payments.list (callback)
 
-```js
-{ type: 'sms',
-  recipients: 1,
-  success: 'true',
-  resultcode: 10,
-  resultmessage: 'Network query sent.' }
+// Specify a set
+mollie.payments.list ({ offset: 20, count: 20 }, callback);
 ```
 
 
-mollie.sms
-----------
+[API documentation](https://www.mollie.com/en/docs/payments#payment-list)
 
-Send a normal or premium SMS to one or many recipients at once.
 
-See the [API documentation](https://www.mollie.nl/beheer/sms-diensten/documentatie/sms/http/en/?s=premium) for details.
+### payments.get
 
-```js
-mollie.sms(
-	{
-		originator: 'MyApp',
-		recipients: '31612345678,31687654321',
-		message:    'Hello world',
-		gateway:	1,
-		reference:	'abc123'
-	},
-	console.log
-)
-```
+**( paymentId, callback )**
+
+Get details about a payment.
+
+argument  | type     | required | description
+:---------|:---------|:---------|:-----------------
+paymentId | string   | yes      | Payment `id`
+callback  | function | yes      | Callback function
+
 
 ```js
-{ type: 'sms',
-  recipients: 2,
-  success: 'true',
-  resultcode: 10,
-  resultmessage: 'Message successfully sent.' }
+mollie.payments.get ('tr_7UhSN1zuXS', callback);
 ```
 
 
-iDEAL
------
-
-Mollie provides a simple streamlined method for handling iDEAL payments. For this to work you need to an active payment profile. See the [API documentation](https://www.mollie.nl/beheer/betaaldiensten/documentatie/ideal/en/) for all the details and variables.
+[API documentation](https://www.mollie.com/en/docs/payments#payment-get)
 
 
-mollie.ideal.banklist
----------------------
+### refunds.create
 
-On your payment page you first need to let the customer choose his bank.
+**( paymentId, [amount], callback)**
 
-### mollie.ideal.banklist ( [testmode], callback )
+Create a refund for a payment
 
-	testmode   optional   true    returns a test-bank, all transactions are fake.
-	                      false   returns real banks, all transactions are real
-	                              with real money.
-	                              The *default* is what you set on your account
-	                              [iDEAL API testmode](https://www.mollie.nl/beheer/betaaldiensten/instellingen/) settings.
-	
-	callback   required           your callback function
 
-### Testmode enabled:
+argument  | type     | required | description
+:---------|:---------|:---------|:-----------------------------------------
+paymentId | string   | yes      | Payment `id`
+amount    | number   | no       | Amount to refund, defaults to full amount
+callback  | function | yes      | Callback function
+
 
 ```js
-mollie.ideal.banklist( true, console.log )
-```
-
-```js
-{ '9999': { bank_id: '9999', bank_name: 'TBM Bank' } }
-```
-
-The key is the same as **bank_id**, this allows you to do quick reverse lookups.
-
-
-### Testmode disabled:
-
-```js
-mollie.ideal.banklist( console.log )
-```
-
-```js
-{ '0031': { bank_id: '0031', bank_name: 'ABN AMRO' },
-  '0761': { bank_id: '0761', bank_name: 'ASN Bank' },
-  '0091': { bank_id: '0091', bank_name: 'Friesland Bank' },
-  '0721': { bank_id: '0721', bank_name: 'ING' },
-  '0801': { bank_id: '0801', bank_name: 'Knab' },
-  '0021': { bank_id: '0021', bank_name: 'Rabobank' },
-  '0771': { bank_id: '0771', bank_name: 'RegioBank' },
-  '0751': { bank_id: '0751', bank_name: 'SNS Bank' },
-  '0511': { bank_id: '0511', bank_name: 'Triodos Bank' },
-  '0161': { bank_id: '0161', bank_name: 'van Lanschot' } }
+mollie.refunds.create ('tr_WDqYK6vllg', 10.95, callback);
 ```
 
 
-mollie.ideal.payment
---------------------
+[API documentation](https://www.mollie.com/en/docs/refunds#refund-create)
 
-Create an iDEAL payment.
 
-```js
-mollie.ideal.payment(
-	{
-		amount:			2000,
-		bank_id:		9999,
-		description:	'Invoice 20120012345',
-		reporturl:		'http://myapp.tld/mollie/ideal',
-		returnurl:		'http://myapp.tld/ideal/complete'
-	},
-	console.log
-)		
-```
+### refunds.list
+
+**( paymentId, callback)**
+
+List refunds for a payment.
+
+
+argument  | type     | required | description
+:---------|:---------|:---------|:-----------------
+paymentId | string   | yes      | Payment `id`
+callback  | function | yes      | Callback function
+
 
 ```js
-{ order: 
-   { transaction_id: 'abcxyz',
-     amount: 2000,
-     currency: 'EUR',
-     url: 'http://www.mollie.nl/partners/ideal-test-bank?order_nr=M0040123&amp;transaction_id=abcdef&amp;trxid=M0040123',
-     message: 'Your iDEAL-payment has successfully been setup. Your customer should visit the given URL to make the payment' } }
+mollie.refunds.list ('tr_WDqYK6vllg', callback);
 ```
 
 
-mollie.ideal.check
-------------------
+[API documentation](https://www.mollie.com/en/docs/refunds#list-refunds)
 
-When the customer completes the payment the API will make a call on your **reporturl** with the **transaction_id** as **GET** argument. Then you can check the payment status **ONCE** with **mollie.ideal.check**. In the meantime the customer will be redirected to your **returnurl** and bring the **transaction_id** too, for cross-referencing.
 
-	testmode         optional   set to _true_ when using the TMB Bank (ID 9999).
-	transaction_id   required   the transaction ID to check
+### refunds.delete
+
+**( paymentId, refundId, callback)**
+
+Get details about one refund for a payment.
+
+
+argument  | type     | required | description
+:---------|:---------|:---------|:-----------------
+paymentId | string   | yes      | Payment `id`
+refundId  | string   | yes      | Refund `id`
+callback  | function | yes      | Callback function
+
 
 ```js
-mollie.ideal.check(
-	{
-		testmode:		true,
-		transaction_id:	'abcxyz'
-	},
-	console.log
-)		
+mollie.refunds.get ('tr_WDqYK6vllg', 're_4qqhO89gsT', callback);
 ```
+
+* The `data` argument to _callback_ is boolean `true` on success.
+* The `data` argument to _callback_ is boolean `false` on fail.
+
+
+[API documentation](https://www.mollie.com/en/docs/refunds#refund-delete)
+
+
+### methods.list
+
+**( [params], callback )**
+
+Get payment methods available to your account.
+
+
+argument | type     | required | description
+:--------|:---------|:---------|:--------------------------------
+params   | object   | no       | Pagination, `offset` and `count`
+callback | function | yes      | Callback function
+
 
 ```js
-{ order: 
-   { transaction_id: 'abcxyz',
-     amount: 2000,
-     currency: 'EUR',
-     payed: true,
-     consumer: 
-      { consumername: 'T. TEST',
-        consumeraccount: 123456789,
-        consumercity: 'Testdorp' },
-     message: 'This iDEAL-order has successfuly been payed for, and this is the first time you check it.',
-     status: 'Success' } }
+mollie.methods.list (callback);
 ```
 
-The variable **payed** can be **true** only once, for security.
+
+[API documentation](https://www.mollie.com/en/docs/methods#methods-list)
 
 
-mollie.ideal.paymentLink
-------------------------
+### issuers.list
 
-Generate an iDEAL payment link to redirect the customer to. This is useful for emails and such. This way Mollie will take care of the banklist, payment creation and confirmation.
+**( [params], callback )**
+
+List issuers for iDeal.
+
+
+argument | type     | required | description
+:--------|:---------|:---------|:--------------------------------
+params   | object   | no       | Pagination, `offset` and `count`
+callback | function | yes      | Callback function
+
 
 ```js
-mollie.ideal.paymentLink(
-	{
-		amount:			2000,
-		description:	'Invoice 20120012345'
-	},
-	console.log
-)
+mollie.issuers.list (callback);
 ```
+
+
+[API documentation](https://www.mollie.com/en/docs/issuers#issuers-list)
+
+
+### issuers.get
+
+**( issuerId, callback )**
+
+Get details about an issuer.
+
+
+argument | type     | required | description
+:--------|:---------|:---------|:-----------------
+issuerId | string   | yes      | Issuer `id`
+callback | function | yes      | Callback function
+
 
 ```js
-{ link: 
-   { url: 'https://secure.mollie.nl/pay/ideal/123-12ab3456/2000_Invoice_20120012345/abcxyz',
-     message: 'Your iDEAL-link has been successfully setup. Your customer should visit the given URL to make the payment.' } }
+mollie.issuers.get ('ideal_ABNANL2A', callback);
 ```
 
-You get the payment status by email.
+
+[API documentation](https://www.mollie.com/en/docs/issuers#issuers-get)
 
 
 Unlicense
@@ -345,3 +314,11 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 
 For more information, please refer to <http://unlicense.org/>
+
+
+Author
+------
+
+Franklin van de Meent
+| [Website](https://frankl.in)
+| [Github](https://github.com/fvdm)

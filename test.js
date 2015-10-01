@@ -135,14 +135,14 @@ queue.push (function () {
 
 
 queue.push (function () {
-  mollie.refunds.create (cache.payment.id, 5, function (err, data) {
+  mollie.refunds.create (cache.payment.id, function (err, data) {
     if (keytype === 'live') {
       cache.refund = data;
-      doTest (err, 'refunds.create option', [
+      doTest (err, 'refunds.create normal', [
         ['type', data instanceof Object]
       ]);
     } else {
-      doTest (null, 'refunds.create option', [
+      doTest (null, 'refunds.create normal', [
         ['type', err instanceof Error],
         ['message', err.message === 'API error'],
         ['code', err.statusCode === 422],
@@ -154,14 +154,14 @@ queue.push (function () {
 
 
 queue.push (function () {
-  mollie.refunds.create (cache.payment.id, function (err, data) {
+  mollie.refunds.create (cache.payment.id, 5, function (err, data) {
     if (keytype === 'live') {
       cache.refund = data;
-      doTest (err, 'refunds.create normal', [
+      doTest (err, 'refunds.create option', [
         ['type', data instanceof Object]
       ]);
     } else {
-      doTest (null, 'refunds.create normal', [
+      doTest (null, 'refunds.create option', [
         ['type', err instanceof Error],
         ['message', err.message === 'API error'],
         ['code', err.statusCode === 422],

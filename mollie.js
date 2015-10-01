@@ -87,6 +87,16 @@ module.exports = function (config) {
       },
   
       create: function (params, callback) {
+        var key;
+
+        if (params.metadata instanceof Object) {
+          for (key in params.metadata) {
+            params ['metadata[' + key + ']'] = params.metadata [key];
+          }
+
+          delete params.metadata;
+        }
+
         talk ('POST', '/payments', params, callback);
       }
     },

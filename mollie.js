@@ -46,6 +46,7 @@ function talk (method, path, params, callback) {
     } catch (e) {
       error = new Error ('invalid response');
       error.error = e;
+      error.statusCode = res && res.statusCode || null;
     }
 
     if (data && data.error) {

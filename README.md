@@ -71,10 +71,10 @@ mollie.methods (myCallback);
 #### Errors
 
 message          | description                         | properties
-:----------------|:------------------------------------|:--------------------------------
+:----------------|:------------------------------------|:---------------------
 request failed   | The request can not be made         | `error`
-invalid response | The API response can't be processed | `error`, `statusCode`, `headers`
-API error        | The API return an error             | `error`, `statusCode`, `headers`
+invalid response | The API response can't be processed | `error`, `statusCode`
+API error        | The API return an error             | `error`, `statusCode`
 
 
 Usage

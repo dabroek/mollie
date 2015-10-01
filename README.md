@@ -211,7 +211,9 @@ callback  | function | yes      | Callback function
 mollie.refunds.get ('tr_WDqYK6vllg', 're_4qqhO89gsT', callback);
 ```
 
-The `data` argument to the _callback_ function is boolean `true` on success.
+* The `data` argument to _callback_ is boolean `true` on success.
+* The `data` argument to _callback_ is boolean `false` on fail.
+
 
 [API documentation](https://www.mollie.com/en/docs/refunds#refund-delete)
 

@@ -36,6 +36,7 @@ mollie.payments.create (payment, function (err, data) {
 });
 ```
 
+
 Installation
 ------------
 
@@ -106,6 +107,7 @@ var paymentObject = {
 mollie.payment.create (paymentObject, callback);
 ```
 
+
 [API documentation](https://www.mollie.com/en/docs/payments#payment-create)
 
 
@@ -130,6 +132,7 @@ mollie.payments.list (callback)
 mollie.payments.list ({ offset: 20, count: 20 }, callback);
 ```
 
+
 [API documentation](https://www.mollie.com/en/docs/payments#payment-list)
 
 
@@ -148,6 +151,7 @@ callback  | function | yes      | Callback function
 ```js
 mollie.payments.get ('tr_7UhSN1zuXS', callback);
 ```
+
 
 [API documentation](https://www.mollie.com/en/docs/payments#payment-get)
 
@@ -170,6 +174,7 @@ callback  | function | yes      | Callback function
 mollie.refunds.create ('tr_WDqYK6vllg', 10.95, callback);
 ```
 
+
 [API documentation](https://www.mollie.com/en/docs/refunds#refund-create)
 
 
@@ -189,6 +194,7 @@ callback  | function | yes      | Callback function
 ```js
 mollie.refunds.list ('tr_WDqYK6vllg', callback);
 ```
+
 
 [API documentation](https://www.mollie.com/en/docs/refunds#list-refunds)
 
@@ -235,6 +241,7 @@ callback | function | yes      | Callback function
 mollie.methods.list (callback);
 ```
 
+
 [API documentation](https://www.mollie.com/en/docs/methods#methods-list)
 
 
@@ -255,6 +262,7 @@ callback | function | yes      | Callback function
 mollie.issuers.list (callback);
 ```
 
+
 [API documentation](https://www.mollie.com/en/docs/issuers#issuers-list)
 
 
@@ -274,6 +282,7 @@ callback | function | yes      | Callback function
 ```js
 mollie.issuers.get ('ideal_ABNANL2A', callback);
 ```
+
 
 [API documentation](https://www.mollie.com/en/docs/issuers#issuers-get)
 

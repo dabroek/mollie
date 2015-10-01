@@ -52,7 +52,6 @@ function talk (method, path, params, callback) {
       error = new Error ('API error');
       error.error = data.error;
       error.statusCode = res && res.statusCode || null;
-      error.headers = res && res.headers || {};
       data = null;
     }
 

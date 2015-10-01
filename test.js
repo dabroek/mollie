@@ -9,12 +9,12 @@ License:        Unlicense (Public Domain, see UNLICENSE file)
 // Setup
 // $ env MOLLIE_APIKEY=secret npm test
 var pkg = require ('./package.json');
+var Mollie = require ('./');
+var mollie;
+var timeout = process.env.MOLLIE_TIMEOUT || 5000;
+var apikey = process.env.MOLLIE_APIKEY || '';
 
-var mollie = require ('./') ({
-  apikey: process.env.MOLLIE_APIKEY || null,
-  timeout: process.env.MOLLIE_TIMEOUT || 5000
-});
-
+var keytype;
 var errors = 0;
 var queue = [];
 var next = 0;
@@ -215,4 +215,20 @@ console.log ('Node.js v' + process.versions.node);
 console.log ('Module  v' + pkg.version);
 console.log ();
 
+if (apikey === '') {
+  console.log ('\u001b[1m\u001b[31mFAIL\u001b[0m - MOLLIE_APIKEY not set');
+} else {
+  apikey.replace (/^(live|test)_/, function (s, type) {
+    keytype = type;
+  });
+
+  console.log ('Using a ' + keytype.toUpperCase () + ' apikey');
+
+  mollie = Mollie ({
+    apikey: apikey,
+    timeout: timeout
+  });
+}
+
+console.log ();
 queue [0] ();

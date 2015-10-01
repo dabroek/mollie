@@ -213,7 +213,7 @@ queue.push (function () {
 
 queue.push (function () {
   mollie.methods.list (function (err, data) {
-    doTest (err, 'methods.list', [
+    doTest (err, 'methods.list normal', [
       ['type', data instanceof Object],
       ['data', data && data.data instanceof Array],
       ['item', data && data.data && data.data [0] instanceof Object]
@@ -223,8 +223,8 @@ queue.push (function () {
 
 
 queue.push (function () {
-  mollie.methods.list (function (err, data) {
-    doTest (err, 'methods.list', [
+  mollie.methods.list ({ offset: 0, count: 10 }, function (err, data) {
+    doTest (err, 'methods.list option', [
       ['type', data instanceof Object],
       ['data', data && data.data instanceof Array],
       ['item', data && data.data && data.data [0] instanceof Object]

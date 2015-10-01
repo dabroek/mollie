@@ -41,7 +41,7 @@ Installation
 ------------
 
 To use this module you need an [API key](https://www.mollie.com/beheer/account/profielen/) from your Mollie account.
-It's recommended to use your **test* API key during development.
+It is recommended to use your **test** API key during development.
 
 `npm install mollie`
 
@@ -75,7 +75,7 @@ message          | description                         | properties
 :----------------|:------------------------------------|:---------------------
 request failed   | The request can not be made         | `error`
 invalid response | The API response can't be processed | `error`, `statusCode`
-API error        | The API return an error             | `error`, `statusCode`
+API error        | The API returned an error           | `error`, `statusCode`
 
 
 Usage
@@ -104,7 +104,7 @@ var paymentObject = {
   }
 };
 
-mollie.payment.create (paymentObject, callback);
+mollie.payments.create (paymentObject, callback);
 ```
 
 
@@ -140,7 +140,7 @@ mollie.payments.list ({ offset: 20, count: 20 }, callback);
 
 **( paymentId, callback )**
 
-Get details about one payment
+Get details about a payment.
 
 argument  | type     | required | description
 :---------|:---------|:---------|:-----------------

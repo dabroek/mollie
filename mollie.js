@@ -19,6 +19,7 @@ function talk (method, path, params, callback) {
     method: method,
     parameters: params || null,
     timeout: parseInt (settings.timeout, 10) || 5000,
+    rejectUnauthorized: true,
     headers: {
       'Accept': 'application/json',
       'Authorization': 'Bearer ' + settings.apikey,

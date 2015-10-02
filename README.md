@@ -63,7 +63,7 @@ function myCallback (err, data) {
   if (err) {
     console.log (err);
   } else {
-    console.log (data.credits);
+    console.log (data);
   }
 }
 

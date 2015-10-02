@@ -17,7 +17,9 @@ Example
 Create a payment for order 112233 at €12.34, return the `paymentUrl` to the customer.
 
 ```js
-var mollie = require ('mollie') ('test_apikey');
+var mollie = require ('mollie') ({
+  apikey: 'test_apikey'
+});
 
 var payment = {
   amount: 12.34,

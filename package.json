@@ -6,7 +6,7 @@
   },
   "name":                 "mollie",
   "description":          "Process payments with Mollie (unofficial)",
-  "version":              "2.0.0",
+  "version":              "2.0.2",
   "main":                 "mollie.js",
   "license":              "Unlicense",
   "repository": {

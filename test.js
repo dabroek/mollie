@@ -185,7 +185,6 @@ dotest.add ('refunds.delete', function (test) {
       test (err)
         .isExactly ('fail', 'data', data, false)
         .done ();
-      ]);
     });
   }
 });

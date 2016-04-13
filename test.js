@@ -7,18 +7,20 @@ Feedback:       https://github.com/fvdm/nodejs-mollie/issues
 License:        Unlicense (Public Domain, see UNLICENSE file)
 */
 
+var dotest = require ('dotest');
+var app = require ('./');
+
+
 // Setup
 // $ env MOLLIE_APIKEY=secret npm test
-var pkg = require ('./package.json');
-var Mollie = require ('./');
-var mollie;
 var timeout = process.env.MOLLIE_TIMEOUT || 5000;
 var apikey = process.env.MOLLIE_APIKEY || '';
+var keytype = apikey.match (/^test_/) ? 'test' : 'live';
 
-var keytype;
-var errors = 0;
-var queue = [];
-var next = 0;
+var mollie = app ({
+  apikey: apikey,
+  timeout: timeout
+});
 
 var cache = {
   payment: {
@@ -33,226 +35,185 @@ var cache = {
 };
 
 
-// handle exits
-process.on ('exit', function () {
-  if (errors === 0) {
-    console.log ('\n\u001b[1mDONE, no errors.\u001b[0m\n');
-    process.exit (0);
-  } else {
-    console.log ('\n\u001b[1mFAIL, ' + errors + ' error' + (errors > 1 ? 's' : '') + ' occurred!\u001b[0m\n');
-    process.exit (1);
+dotest.add ('API key', function (test) {
+  test ()
+    .info ('Using a ' + keytype.toUpperCase () + ' key')
+    .isNotEmpty ('fail', 'MOLLIE_APIKEY', apikey)
+    .done ();
+
+  if (!apikey) {
+    dotest.exit ();
   }
 });
 
-// prevent errors from killing the process
-process.on ('uncaughtException', function (err) {
-  console.log ();
-  console.error (err);
-  console.log ();
-  errors++;
+
+dotest.add ('Module', function (test) {
+  var payments = mollie && mollie.payments;
+  var refunds = mollie && mollie.refunds;
+  var methods = mollie && mollie.methods;
+
+  test ()
+    .isFunction ('fail', 'exports', app)
+    .isObject ('fail', 'module', mollie)
+    .isObject ('fail', '.payments', mollie.payments)
+    .isFunction ('fail', '.payments.create', payments && payments.create)
+    .isFunction ('fail', '.payments.list', payments && payments.list)
+    .isFunction ('fail', '.payments.get', payments && payments.get)
+    .isObject ('fail', '.refunds', mollie.refunds)
+    .isFunction ('fail', '.refunds.create', refunds && refunds.create)
+    .isFunction ('fail', '.refunds.list', refunds && refunds.list)
+    .isFunction ('fail', '.refunds.delete', refunds && refunds.delete)
+    .isObject ('fail', '.methods', mollie.methods)
+    .isFunction ('fail', '.methods.list', methods && methods.list)
+    .done ();
 });
 
-// Queue to prevent flooding
-function doNext () {
-  next++;
-  if (queue [next]) {
-    queue [next] ();
-  }
-}
 
-// doTest( passErr, 'methods', [
-//   ['feeds', typeof feeds === 'object']
-// ])
-function doTest (err, label, tests) {
-  var testErrors = [];
-  var i;
-
-  if (err instanceof Error) {
-    console.error ('\u001b[1m\u001b[31mERROR\u001b[0m - ' + label + '\n');
-    console.dir (err, { depth: null, colors: true });
-    console.log ();
-    console.error (err.stack);
-    console.log ();
-    errors++;
-  } else {
-    for (i = 0; i < tests.length; i++) {
-      if (tests [i] [1] !== true) {
-        testErrors.push (tests [i] [0]);
-        errors++;
-      }
-    }
-
-    if (testErrors.length === 0) {
-      console.log ('\u001b[1m\u001b[32mgood\u001b[0m - ' + label);
-    } else {
-      console.error ('\u001b[1m\u001b[31mFAIL\u001b[0m - ' + label + ' (' + testErrors.join (', ') + ')');
-    }
-  }
-
-  doNext ();
-}
-
-
-queue.push (function () {
+dotest.add ('payments.create', function (test) {
   mollie.payments.create (cache.payment, function (err, data) {
     cache.payment = data;
-    doTest (err, 'payments.create', [
-      ['type', data instanceof Object]
-    ]);
+
+    test (err)
+      .isObject ('fail', 'data', data)
+      .done ();
   });
 });
 
 
-queue.push (function () {
+dotest.add ('payments.list - normal', function (test) {
   mollie.payments.list (function (err, data) {
-    doTest (err, 'payments.list normal', [
-      ['type', data instanceof Object],
-      ['data', data && data.data instanceof Array],
-      ['item', data && data.data && data.data [0] instanceof Object]
-    ]);
+    var item = data && data.data && data.data [0];
+
+    test (err)
+      .isObject ('fail', 'data', data)
+      .isArray ('fail', 'data.data', data.data)
+      .isObject ('fail', 'data.data[0]', item)
+      .done ();
   });
 });
 
 
-queue.push (function () {
+dotest.add ('payments.list - option', function (test) {
   mollie.payments.list ({ offset: 0, count: 10 }, function (err, data) {
-    doTest (err, 'payments.list option', [
-      ['type', data instanceof Object],
-      ['data', data && data.data instanceof Array],
-      ['item', data && data.data && data.data [0] instanceof Object]
-    ]);
+    var item = data && data.data && data.data [0];
+
+    test (err)
+      .isObject ('fail', 'data', data)
+      .isArray ('fail', 'data.data', data.data)
+      .isObject ('fail', 'data.data[0]', item)
+      .done ();
   });
 });
 
 
-queue.push (function () {
+dotest.add ('payments.get', function (test) {
   mollie.payments.get (cache.payment.id, function (err, data) {
-    doTest (err, 'payments.get', [
-      ['type', data instanceof Object]
-    ]);
+    test (err)
+      .isObject ('fail', 'data', data)
+      .done ()#
   });
 });
 
 
-queue.push (function () {
+dotest.add ('refunds.create - normal', function (test) {
   mollie.refunds.create (cache.payment.id, function (err, data) {
     if (keytype === 'live') {
       cache.refund = data;
-      doTest (err, 'refunds.create normal', [
-        ['type', data instanceof Object]
-      ]);
+      test (err)
+        .isObject ('fail', 'data', data)
+        .done ();
     } else {
-      doTest (null, 'refunds.create normal', [
-        ['type', err instanceof Error],
-        ['message', err.message === 'API error'],
-        ['code', err.statusCode === 422],
-        ['error', err && err.error instanceof Object]
-      ]);
+      test ()
+        .isError ('fail', 'err', err)
+        .isExactly ('fail', 'err.message', err && err.message, 'API error')
+        .isExactly ('fail', 'err.statusCode', err && err.statusCode, 422)
+        .isObject ('fail', 'err.error', err && err.error)
+        .done ();
     }
   });
 });
 
 
-queue.push (function () {
+dotest.add ('refunds.create - option', function (test) {
   mollie.refunds.create (cache.payment.id, 5, function (err, data) {
     if (keytype === 'live') {
       cache.refund = data;
-      doTest (err, 'refunds.create option', [
-        ['type', data instanceof Object]
-      ]);
+      test (err)
+        .isObject ('fail', 'data', data)
+        .done ();
     } else {
-      doTest (null, 'refunds.create option', [
-        ['type', err instanceof Error],
-        ['message', err.message === 'API error'],
-        ['code', err.statusCode === 422],
-        ['error', err && err.error instanceof Object]
-      ]);
+      test ()
+        .isError ('fail', 'err', err)
+        .isExactly ('fail', 'err.message', err && err.message, 'API error')
+        .isExactly ('fail', 'err.statusCode', err && err.statusCode, 422)
+        .isObject ('fail', 'err.error', err && err.error)
+        .done ();
     }
   });
 });
 
 
-queue.push (function () {
+dotest.add ('refunds.list - normal', function (test) {
   mollie.refunds.list (cache.payment.id, function (err, data) {
-    doTest (err, 'refunds.list normal', [
-      ['type', data instanceof Object],
-      ['data', data && data.data instanceof Array]
-    ]);
+    test (err)
+      .isObject ('fail', 'data', data)
+      .isArray ('fail', 'data.data', data && data.data)
+      .done ();
   });
 });
 
 
-queue.push (function () {
+dotest.add ('refunds.list - option', function (test) {
   mollie.refunds.list (cache.payment.id, { offset: 0, count: 10 }, function (err, data) {
-    doTest (err, 'refunds.list option', [
-      ['type', data instanceof Object],
-      ['data', data && data.data instanceof Array]
-    ]);
+    test (err)
+      .isObject ('fail', 'data', data)
+      .isArray ('fail', 'data.data', data && data.data)
+      .done ();
   });
 });
 
 
-queue.push (function () {
+dotest.add ('refunds.delete', function (test) {
   if (keytype === 'live') {
     mollie.refunds.delete (cache.payment.id, cache.refund.id, function (err, data) {
-      doTest (err, 'refunds.delete', [
-        ['type', typeof data === 'boolean'],
-        ['data', data === true]
-      ]);
+      test (err)
+        .isExactly ('fail', 'data', data, true)
+        .done ();
     });
   } else {
     mollie.refunds.delete (cache.payment.id, 1, function (err, data) {
-      doTest (err, 'refunds.delete', [
-        ['type', typeof data === 'boolean'],
-        ['data', data === false]
+      test (err)
+        .isExactly ('fail', 'data', data, false)
+        .done ();
       ]);
     });
   }
 });
 
 
-queue.push (function () {
+dotest.add ('methods.list - normal', function (test) {
   mollie.methods.list (function (err, data) {
-    doTest (err, 'methods.list normal', [
-      ['type', data instanceof Object],
-      ['data', data && data.data instanceof Array],
-      ['item', data && data.data && data.data [0] instanceof Object]
-    ]);
+    var item = data && data.data && data.data [0];
+
+    test (err)
+      .isObject ('fail', 'type', data)
+      .isArray ('fail', 'data.data', data.data)
+      .isObject ('fail', 'data.data[0]', item)
+      .done ();
   });
 });
 
 
-queue.push (function () {
+dotest.add ('methods.list - option', function (test) {
   mollie.methods.list ({ offset: 0, count: 10 }, function (err, data) {
-    doTest (err, 'methods.list option', [
-      ['type', data instanceof Object],
-      ['data', data && data.data instanceof Array],
-      ['item', data && data.data && data.data [0] instanceof Object]
-    ]);
+    test (err)
+      .isObject ('fail', 'type', data)
+      .isArray ('fail', 'data.data', data.data)
+      .isObject ('fail', 'data.data[0]', item)
+      .done ();
   });
 });
 
 
 // Start the tests
-console.log ('Running tests...');
-console.log ('Node.js v' + process.versions.node);
-console.log ('Module  v' + pkg.version);
-console.log ();
-
-if (apikey === '') {
-  console.log ('\u001b[1m\u001b[31mFAIL\u001b[0m - MOLLIE_APIKEY not set');
-} else {
-  apikey.replace (/^(live|test)_/, function (s, type) {
-    keytype = type;
-  });
-
-  console.log ('Using a ' + keytype.toUpperCase () + ' apikey');
-
-  mollie = Mollie ({
-    apikey: apikey,
-    timeout: timeout
-  });
-}
-
-console.log ();
-queue [0] ();
+dotest.run ();

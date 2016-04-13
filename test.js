@@ -110,7 +110,7 @@ dotest.add ('payments.get', function (test) {
   mollie.payments.get (cache.payment.id, function (err, data) {
     test (err)
       .isObject ('fail', 'data', data)
-      .done ()#
+      .done ();
   });
 });
 

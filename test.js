@@ -43,7 +43,8 @@ dotest.add ('API key', function (test) {
     dotest.exit ();
   } else {
     dotest.log ('good', 'MOLLIE_APIKEY is set');
-    test.done ();
+    test ()
+      .done ();
   }
 });
 

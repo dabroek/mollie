@@ -205,6 +205,8 @@ dotest.add ('methods.list - normal', function (test) {
 
 dotest.add ('methods.list - option', function (test) {
   mollie.methods.list ({ offset: 0, count: 10 }, function (err, data) {
+    var item = data && data.data && data.data [0];
+
     test (err)
       .isObject ('fail', 'type', data)
       .isArray ('fail', 'data.data', data.data)

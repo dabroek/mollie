@@ -36,13 +36,14 @@ var cache = {
 
 
 dotest.add ('API key', function (test) {
-  test ()
-    .info ('Using a ' + keytype.toUpperCase () + ' key')
-    .isNotEmpty ('fail', 'MOLLIE_APIKEY', apikey)
-    .done ();
+  dotest.log ('info', 'Using a ' + keytype.toUpperCase () + ' key');
 
   if (!apikey) {
+    dotest.log ('fail', 'MOLLIE_APIKEY is required');
     dotest.exit ();
+  } else {
+    dotest.log ('good', 'MOLLIE_APIKEY is set');
+    test.done ();
   }
 });
 

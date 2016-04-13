@@ -25,7 +25,9 @@
   "dependencies": {
     "httpreq":            "^0.4.16"
   },
-  "devDependencies":      {},
+  "devDependencies": {
+    "eslint":             "^2.5.1"
+  },
   "optionalDependencies": {},
   "keywords": [
     "mollie",

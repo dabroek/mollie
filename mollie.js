@@ -56,16 +56,19 @@ function talk (method, path, params, callback) {
       error = new Error ('invalid response');
       error.error = e;
       error.statusCode = res && res.statusCode || null;
+      callback (error);
+      return;
     }
 
     if (data && data.error) {
       error = new Error ('API error');
       error.error = data.error;
       error.statusCode = res && res.statusCode || null;
-      data = null;
+      callback (error);
+      return;
     }
 
-    callback (error, data);
+    callback (null, data);
   });
 }
 

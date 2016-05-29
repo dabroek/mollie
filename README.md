@@ -5,6 +5,7 @@ Unofficial Node.js module to access the Mollie payments API.
 
 [![npm](https://img.shields.io/npm/v/mollie.svg?maxAge=3600)](https://github.com/fvdm/nodejs-mollie/blob/master/CHANGELOG.md)
 [![Build Status](https://travis-ci.org/fvdm/nodejs-mollie.svg?branch=master)](https://travis-ci.org/fvdm/nodejs-mollie)
+[![Dependency Status](https://gemnasium.com/badges/github.com/fvdm/nodejs-mollie.svg)](https://gemnasium.com/github.com/fvdm/nodejs-mollie#runtime-dependencies)
 
 
 * [Node.js](https://nodejs.org)

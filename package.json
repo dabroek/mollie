@@ -1,33 +1,33 @@
 {
   "author": {
-    "name":               "Franklin van de Meent",
-    "email":              "fr@nkl.in",
-    "url":                "https://frankl.in"
+    "name": "Franklin van de Meent",
+    "email": "fr@nkl.in",
+    "url": "https://frankl.in"
   },
-  "name":                 "mollie",
-  "description":          "Process payments with Mollie (unofficial)",
-  "version":              "2.0.2",
-  "main":                 "mollie.js",
-  "license":              "Unlicense",
+  "name": "mollie",
+  "description": "Process payments with Mollie (unofficial)",
+  "version": "2.0.2",
+  "main": "mollie.js",
+  "license": "Unlicense",
   "repository": {
-    "type":               "git",
-    "url":                "git://github.com/fvdm/nodejs-mollie.git"
+    "type": "git",
+    "url": "git://github.com/fvdm/nodejs-mollie.git"
   },
   "bugs": {
-    "url":                "https://github.com/fvdm/nodejs-mollie/issues"
+    "url": "https://github.com/fvdm/nodejs-mollie/issues"
   },
   "engines": {
-    "node":               ">=0.12.0"
+    "node": ">=0.12.0"
   },
   "scripts": {
-    "test":               "st=0; eslint . || st=1; node test.js || st=1; exit $st"
+    "test": "st=0; eslint . || st=1; node test.js || st=1; exit $st"
   },
   "dependencies": {
-    "httpreq":            "^0.4.16"
+    "httpreq": "^0.4.16"
   },
   "devDependencies": {
-    "dotest":             "^1.5.0",
-    "eslint":             "^2.5.1"
+    "dotest": "^1.5.0",
+    "eslint": "^3.0.0"
   },
   "optionalDependencies": {},
   "keywords": [

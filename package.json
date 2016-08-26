@@ -28,7 +28,6 @@
   "devDependencies": {
     "dotest": "^1.13.0"
   },
-  "optionalDependencies": {},
   "keywords": [
     "mollie",
     "payment",
